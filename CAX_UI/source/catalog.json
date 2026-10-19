@@ -1,0 +1,22 @@
+{
+  "verifiedComplete": false,
+  "pages": [
+    { "file": "工作流研发-阶段A.png", "id": "workflow-stage-a", "title": "工作流研发 · 阶段 A", "category": "研发阶段", "description": "阶段 A 的聊天与研发工作台界面。", "order": 1 },
+    { "file": "工作流研发-阶段B.png", "id": "workflow-stage-b", "title": "工作流研发 · 阶段 B", "category": "研发阶段", "description": "阶段 B 的聊天与研发工作台界面。", "order": 2 },
+    { "file": "工作流研发-阶段C.png", "id": "workflow-stage-c", "title": "工作流研发 · 阶段 C", "category": "研发阶段", "description": "阶段 C 的聊天与研发工作台界面。", "order": 3 },
+    { "file": "工作流研发-阶段D1.png", "id": "workflow-stage-d1", "title": "工作流研发 · 阶段 D1", "category": "研发阶段", "description": "阶段 D1 的聊天与研发工作台界面。", "order": 4 },
+    { "file": "工作流研发-阶段D2.png", "id": "workflow-stage-d2", "title": "工作流研发 · 阶段 D2", "category": "研发阶段", "description": "阶段 D2 的聊天与研发工作台界面。", "order": 5 },
+    { "file": "工作流研发-阶段D2.5.png", "id": "workflow-stage-d25", "title": "工作流研发 · 阶段 D2.5", "category": "研发阶段", "description": "阶段 D2.5 的进行状态。", "order": 6 },
+    { "file": "工作流研发-阶段D2.5结束.png", "id": "workflow-stage-d25-complete", "title": "工作流研发 · 阶段 D2.5 结束", "category": "研发阶段", "description": "阶段 D2.5 的结束状态。", "order": 7 },
+    { "file": "工作流研发-阶段E.png", "id": "workflow-stage-e", "title": "工作流研发 · 阶段 E", "category": "研发阶段", "description": "阶段 E 的聊天与研发工作台界面。", "order": 8 },
+    { "file": "工作流研发-执行进度.png", "id": "execution-progress", "title": "执行进度 · 概览", "category": "执行进度", "description": "工作流执行过程的进度概览。", "order": 9 },
+    { "file": "工作流研发-执行进度展开.png", "id": "execution-expanded", "title": "执行进度 · 展开", "category": "执行进度", "description": "展开查看工作流的执行状态。", "order": 10 },
+    { "file": "工作流研发-执行进度展开B.png", "id": "execution-expanded-b", "title": "执行进度 · 展开 B", "category": "执行进度", "description": "执行进度展开状态 B。", "order": 11 },
+    { "file": "工作流研发-执行进度展开B重试.png", "id": "execution-retry-b", "title": "执行进度 · B 重试", "category": "执行进度", "description": "执行过程中的重试状态。", "order": 12 },
+    { "file": "工作流研发-执行进度展开C.png", "id": "execution-expanded-c", "title": "执行进度 · 展开 C", "category": "执行进度", "description": "执行进度展开状态 C。", "order": 13 },
+    { "file": "workflow-plan-modal上.png", "id": "workflow-plan", "title": "工作流整体方案", "category": "详情弹窗", "description": "方案目标、前提假设、风险、验证计划及系统校验。", "order": 14 },
+    { "file": "modal-container-new.png", "id": "development-contract", "title": "详细研发合同", "category": "详情弹窗", "description": "节点导航、输入输出合同、数据合同及假设与风险。", "order": 15 },
+    { "file": "modal-container.png", "id": "node-specification", "title": "节点规格设计", "category": "详情弹窗", "description": "节点基本信息、锁定端口、算法、验收标准与测试计划。", "order": 16 },
+    { "file": "modal-container (1).png", "id": "candidate-file-review", "title": "审查候选文件", "category": "详情弹窗", "description": "候选文件导航、代码预览、文件校验与生成评审。", "order": 17 }
+  ]
+}

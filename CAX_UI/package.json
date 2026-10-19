@@ -1,0 +1,16 @@
+{
+  "name": "tian-shu-design-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "import": "node scripts/import-pages.mjs",
+    "build": "npm run import && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5",
+    "vite": "^7.3.1"
+  }
+}
