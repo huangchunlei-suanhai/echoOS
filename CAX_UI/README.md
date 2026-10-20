@@ -23,7 +23,7 @@
 需要 Node.js 20.19+ 或 22.12+（推荐当前 LTS）。在 `CAX_UI` 目录运行：
 
 ```powershell
-npm ci
+npm ci  # 根据项目中的 package-lock.json 安装 vite、sharp 等依赖。
 npm run dev
 ```
 
