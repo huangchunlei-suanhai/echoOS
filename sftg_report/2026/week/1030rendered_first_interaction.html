@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>两齿轮传动计算工作流 · 韶峰天工</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: #202124;
+      background: #fff;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; }
+    .app-header {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      border-bottom: 1px solid #eceef1;
+    }
+    .brand { font-size: 15px; font-weight: 650; }
+    .sample-label { color: #667085; font-size: 12px; }
+    main { max-width: 850px; margin: 0 auto; padding: 34px 22px 40px; }
+    .conversation-title { margin: 0 0 28px; font-size: 19px; font-weight: 600; }
+    .chat { display: flex; flex-direction: column; gap: 28px; }
+    .turn { display: flex; flex-direction: column; gap: 28px; }
+    .turn-heading { color: #858c95; font-size: 12px; border-top: 1px solid #eceef1; padding-top: 16px; }
+    .user-row { display: flex; justify-content: flex-end; }
+    .user-message {
+      max-width: min(680px, 88%);
+      padding: 13px 17px;
+      border-radius: 18px;
+      background: #f2f3f5;
+      line-height: 1.75;
+    }
+    .assistant { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 13px; }
+    .assistant-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #d9e5dc;
+      border-radius: 50%;
+      color: #39754a;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .assistant-body { min-width: 0; }
+    .assistant-name { margin: 3px 0 15px; color: #4b5563; font-size: 13px; }
+    details { margin: 0 0 22px; }
+    summary {
+      width: fit-content;
+      max-width: 100%;
+      color: #4b5563;
+      cursor: pointer;
+      font-size: 13px;
+      line-height: 1.6;
+      list-style-position: inside;
+    }
+    summary:hover { color: #202124; }
+    .process-meta { color: #8a9099; margin-left: 7px; }
+    .timeline { margin: 13px 0 0 4px; padding-left: 17px; border-left: 1px solid #e3e6ea; }
+    .event { position: relative; padding: 0 0 17px 13px; line-height: 1.55; }
+    .event:last-child { padding-bottom: 2px; }
+    .event::before {
+      position: absolute;
+      top: 6px;
+      left: -21px;
+      width: 7px;
+      height: 7px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      background: #8c969f;
+      content: "";
+    }
+    .event-title { font-size: 13px; }
+    .event-detail { margin-top: 3px; color: #7a828c; font-size: 12px; }
+    .event-progress-text { margin-top: 6px; color: #505963; font-size: 13px; line-height: 1.7; }
+    .event-progress-text p { margin: 0 0 8px; }
+    .event-progress-text p:last-child { margin-bottom: 0; }
+    .event-progress-text pre { overflow: auto; padding: 9px; border-radius: 5px; background: #f5f6f7; }
+    math { font-size: 1.08em; vertical-align: middle; }
+    .display-math { margin: 14px 0; overflow-x: auto; text-align: center; }
+    code {
+      border-radius: 4px;
+      background: #f0f2f4;
+      padding: 2px 5px;
+      color: #475467;
+      font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .tool-result {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 6px;
+      border: 1px solid #e6e9ed;
+      border-radius: 6px;
+      padding: 6px 9px;
+      color: #46505b;
+      font-size: 12px;
+    }
+    .skill-details { margin-top: 8px; }
+    .skill-details summary { color: #59636e; font-size: 12px; }
+    .skill-body {
+      max-height: 480px;
+      overflow: auto;
+      margin: 8px 0 0;
+      border: 1px solid #e6e9ed;
+      border-radius: 6px;
+      background: #fafbfc;
+      padding: 12px;
+      color: #414a54;
+      font: 12px/1.65 ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .check { color: #34804d; font-weight: 700; }
+    .answer { font-size: 15px; line-height: 1.85; }
+    .answer-label { margin: 0 0 9px; color: #737b84; font-size: 12px; }
+    .answer p { margin: 0 0 14px; }
+    .answer ol { margin: 0 0 16px; padding-left: 23px; }
+    .answer li { margin: 0 0 8px; padding-left: 3px; }
+    .answer ul { margin: 0 0 16px; padding-left: 23px; }
+    .answer h2, .answer h3 { margin: 19px 0 9px; font-size: 15px; }
+    .answer table { width: 100%; border-collapse: collapse; margin: 12px 0 16px; font-size: 13px; }
+    .answer th, .answer td { padding: 7px 8px; border-bottom: 1px solid #e8ebee; text-align: left; }
+    .answer th { color: #525b65; font-weight: 600; }
+    .answer pre { overflow: auto; margin: 12px 0 16px; padding: 12px; border-radius: 6px; background: #f5f6f7; font: 12px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .code-block { margin: 12px 0 16px; border-radius: 8px; background: #f7f8fa; overflow: hidden; }
+    .code-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 13px 0; color: #515b66; font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .code-controls { display: flex; gap: 4px; }
+    .code-command { display: inline-flex; align-items: center; gap: 4px; border: 0; border-radius: 5px; background: transparent; padding: 5px 7px; color: #626d78; font: inherit; cursor: pointer; }
+    .code-command:hover { background: #e9edf1; color: #2f3944; }
+    .code-command:focus-visible { outline: 2px solid #5794d2; }
+    .code-command svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .code-block pre, .answer .code-block pre, .event-progress-text .code-block pre { margin: 0; padding: 20px 15px 15px; border-radius: 0; background: transparent; }
+    .code-block pre code { padding: 0; background: none; color: #354253; font-size: 12px; }
+    .code-block .nt { color: #df493d; }
+    .code-block .mi, .code-block .mf { color: #a15b17; }
+    .code-block .kc { color: #187c70; }
+    .code-block .s2 { color: #237847; }
+    .answer strong { font-weight: 650; }
+    .suggestion { margin-top: 16px !important; }
+    .actions {
+      display: flex;
+      margin-top: 25px;
+      padding-top: 10px;
+      align-items: center;
+      gap: 5px;
+    }
+    .icon-button {
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #7b838c;
+      cursor: pointer;
+    }
+    .icon-button:hover:not(:disabled) { background: #f1f3f5; color: #30363d; }
+    .icon-button:focus-visible { outline: 2px solid #5794d2; outline-offset: 1px; }
+    .icon-button:disabled { cursor: not-allowed; opacity: .55; }
+    .icon-button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .skill-action { position: relative; }
+    .skill-trigger { width: auto; min-width: 48px; padding: 0 7px; font-size: 12px; }
+    .skill-menu { position: absolute; bottom: calc(100% + 8px); left: 0; z-index: 2; min-width: 180px; max-width: min(300px, 80vw); padding: 5px; border: 1px solid #e2e5e9; border-radius: 8px; background: #fff; box-shadow: 0 8px 22px #20212420; }
+    .skill-menu[hidden] { display: none; }
+    .skill-menu button { display: block; width: 100%; padding: 8px 9px; border: 0; border-radius: 5px; background: transparent; color: #344054; text-align: left; font: 12px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; cursor: pointer; }
+    .skill-menu button:hover, .skill-menu button:focus-visible { background: #f0f3f6; }
+    .skill-dialog { width: min(760px, calc(100vw - 32px)); max-height: min(80vh, 800px); padding: 0; border: 1px solid #dfe3e8; border-radius: 8px; box-shadow: 0 18px 50px #20212440; }
+    .skill-dialog::backdrop { background: #20212480; }
+    .skill-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #e8ebee; }
+    .skill-dialog-header strong { min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
+    .skill-dialog pre { max-height: calc(80vh - 65px); overflow: auto; margin: 0; padding: 16px; color: #344054; font: 12px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .copy-status { min-width: 52px; color: #34804d; font-size: 12px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    @media (max-width: 600px) {
+      .app-header { height: 52px; padding: 0 15px; }
+      main { padding: 25px 15px 32px; }
+      .conversation-title { font-size: 17px; }
+      .user-message { max-width: 94%; }
+      .assistant { grid-template-columns: 32px minmax(0, 1fr); gap: 10px; }
+      .assistant-mark { width: 31px; height: 31px; }
+      .answer { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">韶峰天工 <span style="color:#9aa1aa;font-weight:400">/ 智能工作台</span></div>
+    <div class="sample-label">缓存会话</div>
+  </header>
+  <main>
+    <h1 class="conversation-title">两齿轮传动计算工作流</h1>
+    <div class="chat">
+      <div class="user-row">
+        <div class="user-message">我想在当前机械测试场景里做一个两齿轮传动计算工作流：输入两齿轮齿数和主动轮转速，输出传动比与从动轮转速。现在只讨论需求，不写文件。哪些定义需要我确认？</div>
+      </div>
+
+      <article class="assistant" aria-label="天枢回复">
+        <div class="assistant-mark" aria-hidden="true">天枢</div>
+        <div class="assistant-body">
+          <div class="assistant-name"> </div>
+          <details open>
+            <summary>已思考执行 <span class="process-meta">已完成 · 2 轮判断 · 1 次工具调用</span></summary>
+            <div class="timeline">
+              <details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event">
+                <div class="event-title">工作流需求澄清 Skill 读取 
+                </div>
+                <details class="skill-details">
+                  <summary>查看工具返回的 Skill 正文 · 2,145 字符</summary>
+                  <pre class="skill-body">---
+name: workflow-requirements-clarification
+description: 在任何工作流 DAG、节点源码或资产写入前识别工程关键歧义；必须先向用户澄清会改变目标、输入输出、物理含义、单位、交付范围或验收的问题，并等待具体回答。
+---
+
+---
+name: workflow-requirements-clarification
+description: &gt;-
+  在任何工作流 DAG、节点源码或资产写入前识别工程关键歧义；必须先向用户澄清会改变目标、输入输出、物理含义、单位、交付范围或验收的问题，并等待具体回答。
+---
+
+# 工作流需求澄清
+
+本 Skill 是工作流实现的前置门禁，不是可选建议。凡是目标、关键输入输出、工程结果含义、运行参数、交付范围或验收方式存在会实质改变实现的未决事项，必须先用自然语言向用户提问并结束本轮；得到具体答复前，不得开始实现或写入 DAG、节点代码、场景资产。把假设列出来、说明风险或提出推荐方案，不等于用户确认。
+
+## 先查事实，不让用户替 Agent 查资料
+
+在提问前，先按需检查当前工作区、现有 DAG 和节点、可复用节点、相关 Skill、CGraph 协议、运行时目录和执行工具。检查环境前置条件：实际 Python 解释器、CGraph import、NodeCatalog 扫描根目录、pytest、关键依赖、浏览器或外部服务。缺少依赖或权限是验证风险/阻断；不要偷偷缩减目标。
+
+把信息明确分为：
+- **已证实事实**：由工作区文件、可信节点接口或工具结果支持。
+- **待验证假设**：可用默认继续且不会改变工程意义的细节；明确标注，不伪装成事实。
+- **用户必须决定的事项**：不同答案会改变目标、结果解释、关键接口、单位/坐标含义、交付对象或验收标准。
+
+不要要求用户替 Agent 设计 DAG、端口、分类、算法库或节点组合；这些应由 Agent 查证和规划。
+
+## 必须暂停并提问的决策
+
+只要答案不同会实质改变以下任一项，就先提问并暂停受影响的实现：
+- 任务类别、实际目标或最终交付对象；
+- 必需输入、输出、参数、文件格式、单位、坐标系/基准；
+- 结果的工程含义、物理假设、材料/质量模型、算法或方法；
+- 用户要求的复用范围、发布/写入位置或运行目标；
+- 用户接受的完成标准、关键精度或验证方式。
+
+工程工作流常见必须澄清项包括：诸如“重心”所指的体积几何质心还是按真实质量分布计算的质量重心；STL 等无单位文件的长度单位和坐标框架；输入是单个模型还是装配；最终需要的是数值、文件、报告还是可视化；交付应留在任务工作区还是写入场景。按任务相关性提问，不机械地把所有问题都问一遍。
+
+用户没给材料属性、单位或坐标约定时，不能因为存在常用默认值就将其视为已确认。若该默认会改变结果的工程含义，必须征询用户；只有用户明确接受该假设后才按其执行。
+
+## 明确的停止规则
+
+- 提问必须在普通自然语言中简洁、具体，说明为什么答案影响实现；提出必要问题后立即结束当前回合，等待用户自然语言回答。
+- 用户只说“继续”“开始”“照做”等泛化指令，而此前提出的关键问题仍未回答时，不得将其解释为对任何特定选项或假设的同意。应指出仍待回答的具体问题，并继续暂停实现。
+- 多个问题中，用户明确回答的部分记为已确认；仍会改变结果或接口的未答项继续阻断相关实现。不能用“我会先按 X 假设”绕过阻断。
+- 允许在等待时继续做不改变结果的资料查阅、库节点检索和方案说明；不允许把“继续查资料”变成写实现、创建 smoke 测试图或发布资产。
+- 自然语言具体答复已经解决关键决策后，不再额外设置确认按钮或反复要求用户确认；复述已达成口径并按请求推进。
+
+## 概览、决定记录与验收
+
+向用户说明拟解决的问题、主要步骤、每次运行的关键输入、输出、已确认事实、待用户决定的关键事项、可接受的安全默认、风险和验收标准。只有在关键决策都足以确定可实施范围后，才可以落图和编码。
+
+验收分层：节点业务测试、Catalog 发现、DAG 加载、整图执行、数值/物理验证、用户界面或浏览器验证。对 HTML/可视化必须区分静态结构存在、浏览器实际渲染、交互实际可用；没有浏览器工具时不能声称后两者通过。外部 CDN、网络、求解器和用户文件均应列为适用风险。
+
+## 澄清完成后的闭环实施
+
+关键需求清楚且用户已要求实施后，自主进行实现，不再等待额外“确认”按钮。实现过程中若出现会改变目标、关键接口、结果语义、复用范围或验收含义的新歧义，暂停受影响部分并重新提问；普通局部技术细节用可验证默认处理。
+
+每个节点都需要真实源码和测试；测试布局必须适配真实 NodeCatalog 扫描目录。区分普通算法 smoke、Catalog 发现、正式 DAG 加载和真实整图执行；缺依赖或权限时如实说明，不能用 stub、固定输出或占位说明替代目标。smoke 文件只能标记为测试输入，不得当作用户模型结果。
+
+用户已明确回答或确认的事实要加入当前需求，不重复询问；用户自然语言补充就是决策记录。
+</pre>
+                </details>
+              </div></div></details>
+            </div>
+          </details>
+
+          <div class="answer">
+            <p>我先只梳理需求，不会写文件。按你目前的描述，目标是根据两齿轮齿数和主动轮转速，计算传动比与从动轮转速。</p>
+            <p>需要你确认的是会改变结果含义的定义：</p>
+            <ol>
+              <li><strong>传动比口径</strong>：采用齿数比 <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>i</mi><mo>=</mo><mfrac><msub><mi>z</mi><mtext>从动</mtext></msub><msub><mi>z</mi><mtext>主动</mtext></msub></mfrac></math>，还是 <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>i</mi><mo>=</mo><mfrac><msub><mi>z</mi><mtext>主动</mtext></msub><msub><mi>z</mi><mtext>从动</mtext></msub></mfrac></math>？不同工程资料对“传动比”的定义并不统一。</li>
+              <li><strong>转速输出是否带方向</strong>：只输出从动轮转速的大小，还是同时表示旋转方向？若要方向，还需区分外啮合还是内啮合；当前输入里没有啮合类型。</li>
+              <li><strong>单位</strong>：主动轮转速是否按 rpm（转/分钟）输入，输出也用 rpm？齿数则按无单位的整数处理。</li>
+            </ol>
+            <p class="suggestion">一个可选的简化口径是：传动比定义为从动轮齿数除以主动轮齿数，输入和输出转速均用 rpm，只计算转速大小，不表示方向；仅适用于标准齿轮啮合关系下的转速比计算。你可以确认采用这套口径，也可以逐项给出其他定义。</p>
+          </div>
+          <div class="actions" aria-label="回复操作">
+            <button class="icon-button" data-copy-response type="button" title="复制回复" aria-label="复制回复">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>
+            </button>
+            <div class="skill-action"><button class="icon-button skill-trigger" type="button" aria-label="查看本轮 Skills" aria-expanded="false">Skills</button><div class="skill-menu" hidden></div></div>
+            <button class="icon-button" type="button" title="缓存回放不支持重新生成" aria-label="重新生成不可用" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"></path><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"></path></svg>
+            </button>
+            <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="赞不可用" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Z"></path><path d="M7 10 12 3a3 3 0 0 1 2 3v4h5a2 2 0 0 1 2 2l-1.5 7a2 2 0 0 1-2 2H7"></path></svg>
+            </button>
+            <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="踩不可用" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Z"></path><path d="m7 14 5 7a3 3 0 0 0 2-3v-4h5a2 2 0 0 0 2-2l-1.5-7a2 2 0 0 0-2-2H7"></path></svg>
+            </button>
+            <button class="icon-button" type="button" title="缓存回放不支持语音播放" aria-label="语音播放不可用" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 5a10 10 0 0 1 0 14"></path></svg>
+            </button>
+            <button class="icon-button" type="button" title="分享功能在缓存回放中不可用" aria-label="分享不可用" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"></path><path d="m7 8 5-5 5 5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg>
+            </button>
+            <span class="copy-status" id="copy-status" aria-live="polite"></span>
+          </div>
+        </div>
+      </article>
+    </div>
+    <!-- RECORDED_INTERACTIONS_START -->
+<section class="turn" aria-label="第 2 次缓存交互">
+  <div class="turn-heading"></div>
+  <div class="user-row"><div class="user-message">我确认：采用外啮合；传动比 i 定义为从动轮齿数除以主动轮齿数。输入为主动轮齿数 20、从动轮齿数 40、主动轮转速 1200 rpm，齿数是无单位正整数，转速是非负的 rpm。输出传动比应为 2，从动轮转速幅值应为 600 rpm，并用单独的 relative_direction=-1 表示与主动轮方向相反。忽略效率、载荷和滑移；对零齿数、负齿数、负转速给出明确输入错误。现在请在当前任务工作区实施真正可由 CGraph 加载和执行的工作流、必要的可复用节点和每个节点的 pytest 测试；运行工作区校验、图加载和整图执行，并报告实际输出与证据。此轮不要发布或改写场景资产。</div></div>
+  <article class="assistant" aria-label="天枢回复">
+    <div class="assistant-mark" aria-hidden="true">天枢</div>
+    <div class="assistant-body">
+      <div class="assistant-name"> </div>
+      <details>
+        <summary>已思考执行 <span class="process-meta">已完成 · 20 次判断 · 33 次工具调用</span></summary>
+        <div class="timeline">
+          
+          
+          <div class="event">
+            <!--  -->
+            <div class="event-progress-text"><p>需求口径已明确。我会先检查当前工作区结构、可复用节点/工作流及相关编写规范，再按当前工作区的 CGraph 接口实现并执行验证；只改任务工作区，不触碰场景资产。</p></div></div>
+          <details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline">
+            <div class="event"><div class="event-title">列出工作区文件 </div></div>
+            
+      <div class="event"><div class="event-title">列出场景节点 </div></div>
+      <div class="event"><div class="event-title">列出场景工作流 </div></div>
+      <div class="event">
+        <div class="event-title">cgraph 工作流研发 Skill 读取 
+        </div>
+        <details class="skill-details">
+          <summary>查看工具返回的 Skill 正文 · 2,467 字符</summary>
+          <pre class="skill-body">---
+name: cgraph-workflow-authoring
+description: 设计可由 CGraph 消费、通过真实节点达成目标的工作流。实施前必须完成需求澄清：关键工程语义或输入输出未获用户具体回答时，停止在方案阶段，不写
+  DAG 或节点代码。
+---
+
+---
+name: cgraph-workflow-authoring
+description: &gt;-
+  设计可由 CGraph 消费、通过真实节点达成目标的工作流。实施前必须完成需求澄清：关键工程语义或输入输出未获用户具体回答时，停止在方案阶段，不写 DAG 或节点代码。
+---
+
+# CGraph 工作流设计
+
+本 Skill 的需求澄清门禁是强制的：先读取 `workflow-requirements-clarification`，再查现有资产和协议。只要关键工程语义、输入输出、单位/坐标、交付范围或验收有会改变实现的未决项，必须向用户自然语言提问并结束当前回合。没有收到针对性答复前，只能查证和说明方案，禁止创建/改写 DAG、节点源码、节点测试或场景资产。把默认假设告诉用户不等于得到同意；“继续”也不是对未答问题的答案。
+
+完成澄清后，交付可由真实 CGraph 编译执行的工作流 JSON、自包含可复用节点和逐节点测试。图不能是说明插图，不得以规划、固定数值或检查壳替代用户目标。工程事实以当前文件、可信节点查询、CGraph 源码及真实工具结果为准。
+
+## 需求与复用
+
+先查工作区、已有图、可复用节点、协议和运行环境；只让用户决定会改变目标、关键输入输出、物理解释、关键单位/坐标、交付位置或验收的事项。不要让用户替 Agent 设计 DAG、端口或库调用。用户回答关键问题后，复述已确认范围并立即按请求实施，不需要额外按钮。
+
+工作流应面向一类需求设计参数；当前算例仅作运行时输入或 smoke 样例，清晰标注，不能伪装成用户业务算例。先查询节点再读可信接口，不凭空假设节点存在。节点库和 Skill 库是长期资产，优先稳定职责与可迁移性。
+
+## 正式文件命名
+
+正式入口统一为 `workflow/workflow.json`。DAG 是有向无环图的结构名称，不规定文件名。图校验、加载、执行和打包应使用同一个正式入口，不得维护两份各自演化的规格。
+
+文件必须使用真实 `CGraphWorkflowSpec`，包含 `node_specs`、`nodes`、`edges`、`inputs`、`outputs`、`input_bindings`、`output_bindings` 及必要 metadata；不能改成自定义简化 DSL。规格文件和 CGraph 编译生成的低层执行 JSON 是不同产物；编译产物可存于 `artifacts/`。
+
+## 图结构协议
+
+- `node_specs[].id` 对应实例 `node_type_id`；`instance_id` 唯一；`kind` 使用适配器支持的 `execute`。
+- 边引用实例 ID；DATA 边声明 `from_port`、`to_port` 和所需 `artifact_contract`；CONTROL 边表达顺序并按协议补字段。
+- 必需输入有唯一绑定、上游边或明确默认值；工作流输出绑定真实节点输出。可选输入必须有具体默认或受支持的缺席策略。
+- dtype 来自真实封闭枚举；复杂载体用 `semantic_type`、`unit`、`extensions.artifact_contract` 声明格式、单位和读取方式。
+- 分类来自真实 taxonomy；节点源码 manifest 与图快照一致。
+- `metadata.artifacts` 为每个实例声明节点源码和测试映射；`metadata.runtime_inputs` 为可复现且明确标记的 smoke 输入。
+- DATA 依赖应有 CONTROL 可达路径；检查环、重复边、悬空字段、缺失输入和不可达节点。
+
+## 节点必须独立交付
+
+每个节点源码文件必须自身定义可注册的 `ExeNodeType` 类，提供合法端口输入后能独立导入、注册并执行。不得导入其他节点源码或另附不可注册 helper。节点间只通过 workflow 端口和文件契约协作；禁止动态导入或修改 `sys.path` 隐藏耦合。少量必要重复优先于隐式源码依赖。不得使用无独立工程含义的万能命令节点。
+
+## 扫描布局
+
+通过真实 NodeCatalog/执行器确认扫描根目录，不假定 `workflow/nodes/`。若扫描根目录为 `nodes/`，节点放 `nodes/`，测试放该扫描目录以外，例如 `workflow/tests/nodes/`。扫描目录只放可注册且自包含的节点源码。
+
+## 验证与交付
+
+按需边实现边测试：节点测试覆盖合法输入、错误边界、结构和关键数值；分别验证独立 Catalog 注册及业务行为；随后运行完整 pytest、Catalog 导出、正式文件加载、整图执行和全量门禁。
+
+主动调用 `validate_workflow_workspace`、`load_cgraph_workflow`、`run_cgraph_workflow` 检查正式入口及真实结果。必须区分语法/导入、Catalog 发现、节点测试、正式 JSON 加载、整图执行和物理/数值验证。临时 API 组图不能代替正式入口整图运行。记录解释器、CGraph 来源/版本和依赖；缺依赖先核实并用授权工具安装，不以 stub、常量或模拟结果掩盖失败。
+
+对 HTML/可视化区分静态产物、浏览器渲染和交互验收；没有浏览器工具时不能声称后两层通过。CFD 收敛与图成功不等于物理精度认证。失败时读取真实错误、最小修改并重测。最终报告交付路径、修改、真实测试证据和未完成原因。
+</pre></details></div><div class="event"><div class="event-title">cgraph 节点研发 Skill 读取 
+  
+</div>
+<details class="skill-details"><summary>查看工具返回的 Skill 正文 · 2,390 字符</summary><pre class="skill-body">---
+name: cgraph-node-authoring
+description: 编写真实可执行、可测试并能被 CGraph 注册和调用的工程节点。任何节点编码前先完成需求澄清；影响结果语义、单位/坐标、关键接口或验收的用户决策未回答时不得写代码。
+---
+
+---
+name: cgraph-node-authoring
+description: &gt;-
+  编写真实可执行、可测试并能被 CGraph 注册和调用的工程节点。任何节点编码前先完成需求澄清；影响结果语义、单位/坐标、关键接口或验收的用户决策未回答时不得写代码。
+---
+
+# CGraph 节点实现
+
+## 实施前的强制需求门禁
+
+编写、修改节点源码或节点测试前，先读取 `workflow-requirements-clarification` 并查现有工作流和节点接口。节点算法、端口、数据格式或测试断言依赖用户尚未决定的工程事实时，必须先自然语言询问用户并结束当前回合，等待具体答复。不得把假设标注、常见默认、用户说“继续”或一般性的实施指令视为对某个具体选项的确认。澄清前可查证工作区和真实接口、报告方案；不得开始节点代码、冒烟实现或通过改端口绕过问题。得到回答后按已确定需求继续，不再要求重复确认。
+
+可复用节点是工程资产。每个节点必须真实读取输入并生成输出，直接继承 `cgraph.library.ExeNodeType`，可被 NodeCatalog 发现、导出和执行；不得用固定答案、说明壳、fallback stub 或伪造基类替代。
+
+## 自包含节点文件（强制）
+
+- 每个节点源码文件就是一个可独立交付模块，必须在该文件定义一个可注册节点类；不能只交付 helper/utils/runtime。
+- 单独取出节点文件，在安装声明的第三方依赖并提供合法端口输入后，必须能独立导入、注册、处理该输入；不得依赖其他节点源码、目录导入副作用或其他节点先执行。
+- 环境探测、文件读写和子进程封装可留在节点文件内部。允许少量必要重复；不以动态导入、临时复制或修改 `sys.path` 隐藏耦合。
+- 若步骤本身有独立工程含义，设计成可注册节点并通过 workflow DATA 边协作；禁止用任意命令万能节点规避自包含要求。
+- 节点可以消费其他节点提供的网格、算例等数据产物；这是数据依赖而非源码依赖。标准库、真实 CGraph、明确声明的第三方依赖和外部求解器依赖允许。
+
+## 实现前检查
+
+在需求澄清完成后，查询并读取 `workflow/workflow.json` 的 node spec、端口、上下游及真实节点源码；读取真实 `DataPort`、`ExeNodeType`、`NodeCatalog` 与验证协议。不要猜测接口、封闭 dtype 或分类。用户算例仅作为运行时输入或 smoke 样例，不写死唯一合法文件、尺寸或工况。
+
+## 节点声明
+
+提供稳定小写唯一 ID、三段版本、展示名、描述、有效分类、tags、DataPort 元组、runtime_hints 和 extensions；run 参数名逐字匹配输入端口。源码 manifest 必须与 workflow 快照一致。
+
+- dtype 使用当前受支持枚举；复杂结构通过 semantic_type、unit、artifact_contract 声明格式、单位、坐标系和边界标签。
+- 节点 extensions 声明 semantic_role、合法 physics_domains 和 constraints。
+- 当前 CGraph 运行时对 dict 原样按端口映射返回；单个 dict 业务输出应返回 `{输出端口名: 业务字典}`。以真实整图执行验证包装行为。
+- 校验缺失、空输入、类型、文件格式、拓扑和物理范围并抛出可定位异常。真实计算依赖必须参与运算，保留真实失败与日志。
+- 禁止未声明网络、任意命令、eval/exec 或越权路径。子进程调用限定工具、参数和工作目录，不拼接用户控制的 shell 程序。
+- 注释解释算法、单位、错误边界和端口映射，并与实现一致。
+
+## 目录和交付
+
+先确认 NodeCatalog 实际扫描根目录。若是根目录 `nodes/`，节点放该目录；测试、几何生成脚本和文档放扫描目录之外，例如 `workflow/tests/nodes/`。扫描目录只放可独立注册的节点源码。正式工作流路径为 `workflow/workflow.json`；`metadata.artifacts` 映射每个实例自己的源码与测试，不使用跨节点源码依赖字段。
+
+## 验证
+
+1. 源码语法检查与普通导入。
+2. 单节点文件隔离验证：只保留该文件，执行真实 NodeCatalog.refresh、manifest 导出和合法输入业务调用，检查全部 import（含函数内 import）。
+3. 每个节点的 pytest 覆盖正常、边界、非法输入、输出结构、关键数值/文件内容；各节点测试和完整测试均要运行。
+4. `validate_workflow_workspace` 检查图、源码映射和测试；`load_cgraph_workflow` 验证正式 JSON 加载；`run_cgraph_workflow` 验证整图数据交接与输出。API 临时图不能代替正式入口。
+5. 失败时读取真实错误并修复后重测；不得伪造通过或维护两份图规格。
+
+记录任务解释器、CGraph 来源/版本及依赖。缺依赖先查证并用授权工具安装，禁止修改宿主 Python。区分语法、Catalog、业务测试、正式图加载、整图执行和物理验证证据；最终只报告真实成功和阻断原因。
+</pre></details></div><div class="event"><div class="event-title">cfd 工作流研发 Skill 读取 </div>
+  <details class="skill-details">
+    <summary>查看工具返回的 Skill 正文 · 2,064 字符</summary>
+    <pre class="skill-body">---
+name: cfd-workflow-authoring
+description: 为 CFD 工作流和节点补充真实物理、数据和验证约束。实施前强制澄清会改变流动目标、输入/输出、单位、边界条件、求解配置或验收口径的问题；未获具体答复前不生成图或实现节点。
+---
+
+---
+name: cfd-workflow-authoring
+description: &gt;-
+  为 CFD 工作流和节点补充真实物理、数据和验证约束。实施前强制澄清会改变流动目标、输入/输出、单位、边界条件、求解配置或验收口径的问题；未获具体答复前不生成图或实现节点。
+---
+
+# CFD 工作流实现约束
+
+开始 CFD DAG、节点代码或场景资产写入前，必须先读取 `workflow-requirements-clarification` 并查证可查事实。流动目标、几何、关键结果、坐标/单位、边界条件、求解模式或验收标准存在会改变实现的未决决策时，先用自然语言具体提问并暂停；不能以常用 CFD 默认值、提出方案或“继续”泛化指令代替用户对决策的答复。等待期间可以查工作区和节点，不能写实现。获得具体答复后记录已确认口径并按请求推进。
+
+本 Skill 提供会改变 CFD 工作流设计和节点实现的领域约束。CFD 工作流要沉淀可迁移能力，不围绕单个 STL 或固定工况写死。
+
+## 需求与物理完整性
+
+- 明确几何、流动类型、目标结果和运行时参数。速度、攻角/来流方向、密度、黏度、参考面积、边界条件、求解模式及质量/收敛门限应有单位和范围。
+- STL 通常不带可信长度单位；进入网格前必须由运行时 `length_unit` 或受控来源确定单位。若单位含义会影响结果且用户未确认，先询问，不得默认为 mm。
+- 外流场/旋翼链至少表达几何检查、计算域/边界、网格、物性工况、求解、收敛/守恒诊断、力后处理和必要可视化。省略会影响结果的步骤必须写明风险。
+- 输出轴向推力或升力系数时必须关联旋转/升力方向、参考面积、来流、单位和坐标系；桨轴朝上时轴向推力才可近似称升力。
+
+## CFD 节点组织（强制）
+
+- 每个 CFD 节点源码文件必须自身定义一个可注册的 `ExeNodeType`，可单独导入、注册并处理合法端口输入；节点文件必须自包含，不得导入其他节点源码或不可注册共享 helper/utils/runtime。
+- 环境发现、OpenFOAM bashrc 加载、受限子进程调用、日志保存、字典生成、格式解析等私有函数应内聚在各自节点文件中；允许少量重复，禁止源码辅助模块隐藏耦合。
+- 节点间只通过 workflow/workflow.json 端口数据或文件产物契约协作；每个节点文件独立交付时不得需要兄弟节点文件。
+- 不得把不可注册 Python 文件作为节点交付，也不得用万能命令节点替代职责明确的 CFD 节点。
+
+## OpenFOAM 环境
+
+- 不要仅凭 `shutil.which` 或当前 PATH 判断安装。检查可配置的 `OPENFOAM_BASHRC` 和已知安装根目录，并在节点自己的受控子进程中 source `etc/bashrc` 后调用 `foamVersion`，记录入口和版本。
+- Python 节点不要修改父进程环境；通过受控 bash 子进程加载环境，限制工具、参数和工作目录，保存返回码、stdout、stderr 和 case 日志。
+- OpenFOAM 13 常用 `foamRun -solver incompressibleFluid`；`simpleFoam`/`pimpleFoam` 可能只是兼容脚本。版本可用不等于算例、网格、边界和收敛有效。
+- 区分未安装、环境未加载、二进制/架构不可运行、case 适配缺失和求解不收敛；不要统一称为求解器缺失。
+
+## 网格、求解与验证
+
+- Gmsh/OpenFOAM 网格必须保留单位、物理组、边界标签和坐标系；网格质量门禁、MRF/旋转区非空、残差、守恒和载荷波动须连接到下游结果。
+- 不用固定数字、简化公式或未执行的力文件伪造推力。质量或收敛失败时保留失败状态并禁止发布推力。
+- 通过网格加密、模型对比或实验/参考数据验证物理结果；CGraph 整图成功只证明流程和数据交接成功，不证明 CFD 精度。
+- 正式入口为 `workflow/workflow.json`；metadata.artifacts 只映射各实例自己的源码和测试。
+
+## 典型功能链
+
+```text
+几何与单位 -&gt; 几何/拓扑检查 -&gt; 计算域与边界 -&gt; 体网格与质量
+-&gt; 物性/工况 -&gt; 旋转区域与求解器 -&gt; 残差/守恒/载荷稳定性
+-&gt; 推力/扭矩/功率及系数后处理 -&gt; 可视化或报告
+```
+
+所有会影响结果且已确认的步骤必须在 DAG 中有真实节点和数据边，不能只写在 goal 或 risks。
+</pre></details></div>
+          </div></details>
+<div class="event"><div class="event-progress-text"><p>当前任务工作区为空，场景目录也没有可复用节点或工作流，因此需要建立完整的任务工作区交付。接下来先查真实 CGraph 运行时与图/节点 schema，确保实现符合执行器接口，而不是凭模板猜字段。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">列出已有节点 </div></div>
+<div class="event"><div class="event-title">准备任务环境</div></div>
+<div class="event"><div class="event-title">获取任务环境 </div></div>
+<div class="event"><div class="event-title">运行工作区命令</div></div>
+<div class="event"><div class="event-title">运行工作区命令</div></div></div></details>
+<div class="event"><div class="event-progress-text"><p>运行时已确认 CGraph 可导入，但当前没有 pytest；我会查项目实际执行入口、CGraph 基类和 JSON 编译 schema，同时确认 pytest 是否能通过授权依赖安装。之后按真实接口组织单节点计算与正式图。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">运行工作区命令</div></div>
+<div class="event"><div class="event-title">运行工作区命令</div></div>
+<div class="event"><div class="event-title">运行工作区命令</div></div>
+<div class="event"><div class="event-title">安装任务依赖项</div></div>
+<div class="event"><div class="event-title">运行工作区命令</div></div></div></details>
+<div class="event"><div class="event-progress-text"><p>CGraph 运行时和平台 schema 都可用，pytest 已安装到隔离任务环境。由于整项计算是一个明确、紧凑的领域职责，我采用一个自包含可注册节点：校验正整数齿数与非负 rpm，计算比值、转速幅值及方向；正式图以确认的输入作为可复现 smoke 绑定，并输出完整结果。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">运行工作区命令</div></div>
+
+<div class="event"><div class="event-title">运行工作区命令</div></div>
+
+<div class="event"><div class="event-title">运行工作区命令</div></div>
+
+<div class="event"><div class="event-title">运行工作区命令</div></div>
+
+<div class="event"><div class="event-title">应用补丁</div></div>
+
+<div class="event"><div class="event-title">运行工作区命令</div></div>
+
+<div class="event"><div class="event-title">校验工作流工作区</div></div>
+<div class="event"><div class="event-title">运行工作区命令</div></div>
+
+<div class="event"><div class="event-title">加载 cgraph 工作流</div></div></div></details>
+
+<div class="event"><div class="event-progress-text"><p>真实 Catalog 注册、30 项 pytest 和正式图加载均已通过。全量工作区校验发现源码/测试映射必须使用数组且字段名为单数 <code>test</code>，我会修正这一交付元数据格式，再重跑校验与整图执行。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">运行工作区命令</div></div><div class="event"><div class="event-title">运行工作区命令</div></div><div class="event"><div class="event-title">应用补丁</div></div><div class="event"><div class="event-title">运行工作区命令</div></div><div class="event"><div class="event-title">运行 CGraph 工作流</div></div><div class="event"><div class="event-title">校验工作流工作区</div></div></div></details><div class="event"><div class="event-progress-text"><p>整图实际输出已得到 <code>2.0、600.0 rpm、-1</code>，与验收值一致；修正映射后，全量工作区校验也已通过且无问题。现在保存运行环境与验证摘要，便于后续在任务工作区复核结果。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">运行工作区命令</div></div><div class="event"><div class="event-title">写入工作区文件</div></div></div></details></div>
+      </details>
+      <!-- <div class="answer-label">正式回复</div> -->
+      <div class="answer"><p>已在当前任务工作区完成实现，<strong>真实 CGraph 图加载、整图执行和全量工作区校验均通过</strong>。本轮未发布或改写任何场景资产。</p>
+<p>使用你确认的输入，整图实际输出为：</p>
+<div class="code-block" data-language="json"><div class="code-header"><span>json</span><div class="code-controls"><button class="code-command" type="button" data-copy-code title="复制代码" aria-label="复制代码"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>复制</button><button class="code-command" type="button" data-download-code title="下载 JSON" aria-label="下载 JSON"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M4 18v3h16v-3"></path></svg>下载</button></div></div><pre><code class="language-json"><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;transmission_ratio&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;driven_speed_rpm&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">600.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;relative_direction&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span>
+<span class="p">}</span></code></pre></div>
+<p>计算采用 <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>i</mi><mo>=</mo><mfrac><msub><mi>z</mi><mtext>从动</mtext></msub><msub><mi>z</mi><mtext>主动</mtext></msub></mfrac></math>、<math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>n</mi><mtext>从动</mtext></msub><mo>=</mo><mfrac><msub><mi>n</mi><mtext>主动</mtext></msub><mi>i</mi></mfrac></math>。转速输出为非负幅值，<code>relative_direction=-1</code> 单独表示外啮合的反向关系。</p>
+<p>交付文件均位于任务工作区：</p>
+<table><thead><tr><th>文件</th><th>内容</th></tr></thead><tbody><tr><td><code>workflow/workflow.json</code></td><td>正式 CGraphWorkflowSpec，包含端口、输入输出绑定、节点快照和运行输入</td></tr><tr><td><code>nodes/external_gear_pair.py</code></td><td>自包含可复用节点 <code>mechanical.external_gear_pair</code>，版本 <code>1.0.0</code></td></tr><tr><td><code>workflow/tests/nodes/test_external_gear_pair.py</code></td><td>节点 pytest 测试</td></tr><tr><td><code>artifacts/workflow.json</code></td><td>真实编译生成并加载执行的 CGraph 运行产物</td></tr><tr><td><code>artifacts/pytest.xml</code></td><td>pytest 测试报告</td></tr><tr><td><code>artifacts/catalog.json</code></td><td>真实 NodeCatalog 导出清单</td></tr><tr><td><code>artifacts/environment.json</code></td><td>Python、CGraph 来源及版本记录</td></tr><tr><td><code>artifacts/verification_summary.json</code></td><td>实测结果摘要及对应工具调用证据</td></tr></tbody></table>
+<p>验证结果：</p>
+<ul><li><strong>pytest：30 项通过，0 项失败。</strong> 覆盖减速、增速、等速、零转速、非整数传动比，以及零/负齿数、负转速、非法类型和非有限转速。</li><li><strong>独立节点注册通过。</strong> 测试仅复制单个节点文件到隔离目录，再由真实 NodeCatalog 扫描、注册并调用。</li><li><strong>正式图加载通过。</strong> <code>graph_loaded=true</code>，发现节点类型 <code>mechanical.external_gear_pair</code>。</li><li><strong>整图执行通过。</strong> 执行事件中 <code>TASK_COMPLETED</code> 为 <code>success</code>，<code>GRAPH_OUTPUT</code> 无错误。</li><li><strong>全量工作区校验通过。</strong> <code>graph_valid</code>、<code>nodes_valid</code>、<code>tests_valid</code>、<code>cgraph_valid</code> 均为 <code>true</code>，错误列表为空。</li></ul>
+<p>节点实际读取输入计算，未写死算例结果；零齿数、负齿数及负转速会抛出包含输入端口名称的明确 <code>ValueError</code>。运行环境记录为 Python 3.12.3、CGraph 0.1.0、pytest 9.1.1。</p></div>
+      <div class="actions" aria-label="回复操作">
+  <button class="icon-button" data-copy-response type="button" title="复制回复" aria-label="复制回复">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>
+  </button>
+  <div class="skill-action"><button class="icon-button skill-trigger" type="button" aria-label="查看本轮 Skills" aria-expanded="false">Skills</button><div class="skill-menu" hidden></div></div>
+  <button class="icon-button" type="button" title="缓存回放不支持重新生成" aria-label="重新生成不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"></path><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="赞不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Z"></path><path d="M7 10 12 3a3 3 0 0 1 2 3v4h5a2 2 0 0 1 2 2l-1.5 7a2 2 0 0 1-2 2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="踩不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Z"></path><path d="m7 14 5 7a3 3 0 0 0 2-3v-4h5a2 2 0 0 0 2-2l-1.5-7a2 2 0 0 0-2-2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不支持语音播放" aria-label="语音播放不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 5a10 10 0 0 1 0 14"></path></svg></button>
+  <button class="icon-button" type="button" title="分享功能在缓存回放中不可用" aria-label="分享不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"></path><path d="m7 8 5-5 5 5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg></button>
+  <span class="copy-status" aria-live="polite"></span>
+</div>
+    </div>
+  </article>
+</section>
+<section class="turn" aria-label="第 3 次缓存交互">
+  <div class="turn-heading"></div>
+  <div class="user-row"><div class="user-message">这个结果符合预期。请在刚才同一个齿轮传动工作流中增加一个输出 driven_angular_speed_rad_s，表示从动轮角速度大小，单位 rad/s，按已计算的 driven_speed_rpm 换算。原有 transmission_ratio、driven_speed_rpm、relative_direction 保持语义不变。请同步修改节点、工作流输出绑定和测试，并用 20/40 齿、主动轮 1200 rpm 的算例重新执行整图；新输出应约为 62.8318530718 rad/s。请重新运行相关测试和工作区校验，暂时不要发布到场景。</div></div>
+  <article class="assistant" aria-label="天枢回复">
+    <div class="assistant-mark" aria-hidden="true">天枢</div>
+    <div class="assistant-body">
+      <div class="assistant-name"> </div>
+      <details>
+        <summary>已思考执行 <span class="process-meta">已完成 · 7 次判断 · 11 次工具调用</span></summary>
+        <div class="timeline"><div class="event"><div class="event-progress-text"><p>我会在同一节点中按 <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>ω</mi><mo>=</mo><mi>n</mi><mo>×</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mn>60</mn></mfrac></math> 换算从动轮角速度幅值，同步更新图的输出声明、绑定和测试，再重新加载、执行整图并校验工作区。验收仍使用 20/40 齿、1200 rpm，新输出应约为 62.8318530718 rad/s；本轮只修改任务工作区。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">读取工作区文件</div></div><div class="event"><div class="event-title">读取工作区文件</div></div><div class="event"><div class="event-title">读取工作区文件</div></div><div class="event"><div class="event-title">准备任务环境</div></div><div class="event"><div class="event-title">应用补丁</div></div><div class="event"><div class="event-title">运行工作区命令</div></div><div class="event"><div class="event-title">运行工作区命令</div></div><div class="event"><div class="event-title">加载 cgraph 工作流</div></div><div class="event"><div class="event-title">运行 CGraph 工作流</div></div><div class="event"><div class="event-title">校验工作流工作区</div></div><div class="event"><div class="event-title">写入工作区文件</div></div></div></details></div>
+      </details>
+      <!-- <div class="answer-label">正式回复</div> -->
+      <div class="answer"><p>已在同一个齿轮传动工作流中新增 <code>driven_angular_speed_rad_s</code>，节点和工作流版本更新为 <code>1.1.0</code>。新输出按已计算的从动轮转速幅值换算：</p>
+<div class="display-math"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>ω</mi><mtext>从动</mtext></msub><mo>=</mo><msub><mi>n</mi><mtext>从动</mtext></msub><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mn>60</mn></mfrac></math></div>
+<p>使用 <strong>20/40 齿、主动轮 1200 rpm</strong> 重新执行真实 CGraph 整图，实际输出为：</p>
+<div class="code-block" data-language="json"><div class="code-header"><span>json</span><div class="code-controls"><button class="code-command" type="button" data-copy-code title="复制代码" aria-label="复制代码"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>复制</button><button class="code-command" type="button" data-download-code title="下载 JSON" aria-label="下载 JSON"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M4 18v3h16v-3"></path></svg>下载</button></div></div><pre><code class="language-json"><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;driven_angular_speed_rad_s&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">62.83185307179586</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;transmission_ratio&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;driven_speed_rpm&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">600.0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;relative_direction&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span>
+<span class="p">}</span></code></pre></div>
+<p>角速度单位为 <strong>rad/s</strong>，符合预期值约 <code>62.8318530718</code>；原有三个输出的语义保持不变。</p>
+<p>本次同步修改了：</p>
+<ul><li><code>nodes/external_gear_pair.py</code>：新增角速度端口及换算。</li><li><code>workflow/workflow.json</code>：同步节点规格、工作流输出声明和输出绑定。</li><li><code>workflow/tests/nodes/test_external_gear_pair.py</code>：新增角速度数值、单位及绑定检查，并保留原有输入错误和运动学回归测试。</li></ul>
+<p>验证结果：</p>
+<table><thead><tr><th>验证项</th><th>实际结果</th></tr></thead><tbody><tr><td>pytest</td><td><strong>32 passed</strong></td></tr><tr><td>正式 CGraph 图加载</td><td>通过，<code>graph_loaded=true</code></td></tr><tr><td>整图执行</td><td>通过，任务状态 <code>success</code>，图输出无错误</td></tr><tr><td>全量工作区校验</td><td>全部通过，<code>errors=[]</code></td></tr></tbody></table>
+<p>测试报告位于 <code>artifacts/pytest.xml</code>；本轮验证摘要及工具调用证据已更新至 <code>artifacts/verification_summary.json</code>，编译产物为 <code>artifacts/workflow.json</code>。</p>
+<p>本轮仅修改任务工作区，<strong>未发布或改写场景资产</strong>。</p></div>
+      <div class="actions" aria-label="回复操作">
+  <button class="icon-button" data-copy-response type="button" title="复制回复" aria-label="复制回复">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>
+  </button>
+  <button class="icon-button" type="button" title="缓存回放不支持重新生成" aria-label="重新生成不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"></path><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="赞不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Z"></path><path d="M7 10 12 3a3 3 0 0 1 2 3v4h5a2 2 0 0 1 2 2l-1.5 7a2 2 0 0 1-2 2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="踩不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Z"></path><path d="m7 14 5 7a3 3 0 0 0 2-3v-4h5a2 2 0 0 0 2-2l-1.5-7a2 2 0 0 0-2-2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不支持语音播放" aria-label="语音播放不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 5a10 10 0 0 1 0 14"></path></svg></button>
+  <button class="icon-button" type="button" title="分享功能在缓存回放中不可用" aria-label="分享不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"></path><path d="m7 8 5-5 5 5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg></button>
+  <span class="copy-status" aria-live="polite"></span>
+</div>
+    </div>
+  </article>
+</section>
+<section class="turn" aria-label="第 4 次缓存交互">
+  <div class="turn-heading"></div>
+  <div class="user-row"><div class="user-message">请把刚才已验证的齿轮传动工作流发布到当前测试场景，供画布的节点库与工作流列表读取。节点资产请使用 nodes/external_gear_pair.json 与同名 nodes/external_gear_pair.py；工作流资产请使用 workflows/external_gear_pair/manifest.json 与 graph.json。发布内容须对应当前 1.1.0 版本及四个输出；只使用当前场景受限写入机制，逐个展示待确认的文件、差异和确认操作，不绕过前端的逐次确认。</div></div>
+  <article class="assistant" aria-label="天枢回复">
+    <div class="assistant-mark" aria-hidden="true">天枢</div>
+    <div class="assistant-body">
+      <div class="assistant-name"> </div>
+      <details>
+        <summary>已思考执行 <span class="process-meta">已完成 · 5 次判断 · 7 次工具调用</span></summary>
+        <div class="timeline"><div class="event"><div class="event-progress-text"><p>我会先核对当前 1.1.0 产物和场景资产格式，再通过受限写入机制逐个提交这四个文件。每次只提交一个待确认文件，并展示差异；收到该次 <code>approve_scene_write</code> 确认后再继续下一份。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">列出场景节点 </div></div><div class="event"><div class="event-title">列出场景工作流 </div></div><div class="event"><div class="event-title">读取工作区文件</div></div><div class="event"><div class="event-title">读取工作区文件</div></div><div class="event"><div class="event-title">运行工作区命令</div></div><div class="event"><div class="event-title">运行工作区命令</div></div></div></details><div class="event"><div class="event-progress-text"><p>当前场景的节点和工作流清单均为空。第 1 个待确认文件是 <code>nodes/external_gear_pair.json</code>：新增已验证的节点清单，ID 为 <code>mechanical.external_gear_pair</code>、版本为 <code>1.1.0</code>，包含三个输入和四个输出；JSON 内容来自真实 NodeCatalog 导出。下面提交该文件的写入申请，完整新增差异由受限写入工具生成。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">写入场景文件</div></div></div></details></div>
+      </details>
+      <!-- <div class="answer-label">正式回复</div> -->
+      <div class="answer"><p>第 <strong>1/4</strong> 个文件已提交受限写入申请，<strong>尚未写入场景</strong>。</p>
+<table><thead><tr><th>项目</th><th>待确认内容</th></tr></thead><tbody><tr><td>当前场景</td><td><code>gearbox_e2e</code></td></tr><tr><td>文件</td><td><code>nodes/external_gear_pair.json</code></td></tr><tr><td>差异</td><td>新增文件，共 35 行；无旧文件被覆盖</td></tr><tr><td>节点</td><td><code>mechanical.external_gear_pair</code></td></tr><tr><td>版本</td><td><code>1.1.0</code></td></tr><tr><td>输入</td><td>主动轮齿数、从动轮齿数、主动轮转速 rpm</td></tr><tr><td>输出</td><td><code>transmission_ratio</code>、<code>driven_speed_rpm</code>、<code>relative_direction</code>、<code>driven_angular_speed_rad_s</code></td></tr></tbody></table>
+<p>完整新增差异已由本次工具结果提供。请通过前端确认本次修改，发送：</p>
+<pre><code class="language-text">approve_scene_write 090244939cfd39a9c7c5b4fbceb9057a</code></pre>
+<p>确认后，我会核对写入结果，再提交第 2 个文件 <code>nodes/external_gear_pair.py</code>，随后逐次提交工作流的 <code>manifest.json</code> 和 <code>graph.json</code>。</p>
+<p>此处暂停是当前场景受限写入机制及你要求的逐次确认所必需：工具已返回 <code>requires_confirmation</code>，本次确认仅授权上述一个 JSON 文件。</p></div>
+      <button type="button" title="查看缓存中已录制的确认结果" onclick="this.closest('.turn').nextElementSibling.scrollIntoView({ behavior: 'smooth', block: 'start' })" style="margin-top: 6px; padding: 8px 20px; border: 0; border-radius: 6px; background: #2563eb; color: #fff; font: inherit; cursor: pointer;">确认</button>
+      <div class="actions" aria-label="回复操作">
+  <button class="icon-button" data-copy-response type="button" title="复制回复" aria-label="复制回复">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>
+  </button>
+  <button class="icon-button" type="button" title="缓存回放不支持重新生成" aria-label="重新生成不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"></path><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="赞不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Z"></path><path d="M7 10 12 3a3 3 0 0 1 2 3v4h5a2 2 0 0 1 2 2l-1.5 7a2 2 0 0 1-2 2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="踩不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Z"></path><path d="m7 14 5 7a3 3 0 0 0 2-3v-4h5a2 2 0 0 0 2-2l-1.5-7a2 2 0 0 0-2-2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不支持语音播放" aria-label="语音播放不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 5a10 10 0 0 1 0 14"></path></svg></button>
+  <button class="icon-button" type="button" title="分享功能在缓存回放中不可用" aria-label="分享不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"></path><path d="m7 8 5-5 5 5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg></button>
+  <span class="copy-status" aria-live="polite"></span>
+</div>
+    </div>
+  </article>
+</section>
+<section class="turn" aria-label="第 5 次缓存交互">
+  <div class="turn-heading"></div>
+  <div class="user-row"><div class="user-message"><p>已确认前端操作：审批场景写入</p>
+    <p><span class="sample-label"></span><code>approve_scene_write</code> <code>task_id=adf7a1b1ce4648a8b636b5f0622fbcba</code></p> <code>operation_id=090244939cfd39a9c7c5b4fbceb9057a</code></div></div>
+  <article class="assistant" aria-label="天枢回复">
+    <div class="assistant-mark" aria-hidden="true">天枢</div>
+    <div class="assistant-body">
+      <div class="assistant-name"> </div>
+      <details>
+        <summary>已思考执行 <span class="process-meta">已完成 · 4 次判断 · 4 次工具调用</span></summary>
+        <div class="timeline"><div class="event"><div class="event-title">场景修改已按用户确认应用</div><div class="event-detail"><code>status=applied</code> <code>operation_id=090244939cfd39a9c7c5b4fbceb9057a</code> <code>path=nodes/external_gear_pair.json</code></div></div><div class="event"><div class="event-progress-text"><p>第 1 个节点 JSON 已由后端应用。我会核对场景中的清单，再提交第 2/4 个文件 <code>nodes/external_gear_pair.py</code>；本次申请使用已验证的 1.1.0 源码，仍需单独确认。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">列出场景节点 </div></div><div class="event"><div class="event-title">读取工作区文件</div></div><div class="event"><div class="event-title">读取场景节点</div></div><div class="event"><div class="event-title">写入场景文件</div></div></div></details></div>
+      </details>
+      <!-- <div class="answer-label">正式回复</div> -->
+      <div class="answer"><p>已核实第 1 个文件 <code>nodes/external_gear_pair.json</code> 已写入场景 <code>gearbox_e2e</code>，场景节点清单可读到版本 <strong>1.1.0</strong>。</p>
+<p>第 <strong>2/4</strong> 个文件已提交受限写入申请，<strong>尚未写入</strong>：</p>
+<table><thead><tr><th>项目</th><th>待确认内容</th></tr></thead><tbody><tr><td>文件</td><td><code>nodes/external_gear_pair.py</code></td></tr><tr><td>差异</td><td>新增 57 行，无旧文件被覆盖</td></tr><tr><td>源码</td><td>与任务工作区已通过 32 项测试的 1.1.0 源码一致</td></tr><tr><td>功能</td><td>输入校验、传动比、从动转速幅值、相对方向及角速度幅值计算</td></tr></tbody></table>
+<p>完整新增差异已由本次写入申请展示。请通过前端确认，发送：</p>
+<pre><code class="language-text">approve_scene_write caf8b07a1d11333962253ea8da312e1c</code></pre>
+<p>确认后将核对节点 JSON 与源码，再逐次提交 <code>workflows/external_gear_pair/manifest.json</code> 和 <code>graph.json</code>。</p>
+<p>当前暂停由场景受限写入机制和你要求的逐文件确认决定；工具返回 <code>requires_confirmation</code>，本次确认仅授权上述 Python 文件。</p></div>
+      <button type="button" title="查看缓存中已录制的确认结果" onclick="this.closest('.turn').nextElementSibling.scrollIntoView({ behavior: 'smooth', block: 'start' })" style="margin-top: 6px; padding: 8px 20px; border: 0; border-radius: 6px; background: #2563eb; color: #fff; font: inherit; cursor: pointer;">确认</button>
+      <div class="actions" aria-label="回复操作">
+  <button class="icon-button" data-copy-response type="button" title="复制回复" aria-label="复制回复">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>
+  </button>
+  <button class="icon-button" type="button" title="缓存回放不支持重新生成" aria-label="重新生成不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"></path><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="赞不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Z"></path><path d="M7 10 12 3a3 3 0 0 1 2 3v4h5a2 2 0 0 1 2 2l-1.5 7a2 2 0 0 1-2 2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="踩不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Z"></path><path d="m7 14 5 7a3 3 0 0 0 2-3v-4h5a2 2 0 0 0 2-2l-1.5-7a2 2 0 0 0-2-2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不支持语音播放" aria-label="语音播放不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 5a10 10 0 0 1 0 14"></path></svg></button>
+  <button class="icon-button" type="button" title="分享功能在缓存回放中不可用" aria-label="分享不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"></path><path d="m7 8 5-5 5 5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg></button>
+  <span class="copy-status" aria-live="polite"></span>
+</div>
+    </div>
+  </article>
+</section>
+<section class="turn" aria-label="第 6 次缓存交互">
+  <div class="turn-heading"></div>
+  <div class="user-row"><div class="user-message"><p>已确认前端操作：审批场景写入</p>
+    <p><span class="sample-label"></span><code>approve_scene_write</code> <code>task_id=adf7a1b1ce4648a8b636b5f0622fbcba</code><p>
+      <code>operation_id=caf8b07a1d11333962253ea8da312e1c</code></div></div>
+  <article class="assistant" aria-label="天枢回复">
+    <div class="assistant-mark" aria-hidden="true">天枢</div>
+    <div class="assistant-body">
+      <div class="assistant-name"> </div>
+      <details>
+        <summary>已思考执行 <span class="process-meta">已完成 · 3 次判断 · 4 次工具调用</span></summary>
+        <div class="timeline"><div class="event"><div class="event-title">场景修改已按用户确认应用</div><div class="event-detail"><code>status=applied</code> <code>operation_id=caf8b07a1d11333962253ea8da312e1c</code> <code>path=nodes/external_gear_pair.py</code></div></div><div class="event"><div class="event-progress-text"><p>第 2 个节点源码文件已由后端应用。我会回读核对，并检查工作流清单的读取格式，然后提交第 3/4 个文件 <code>workflows/external_gear_pair/manifest.json</code> 的单独写入申请。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">读取场景节点</div></div><div class="event"><div class="event-title">列出场景工作流 </div></div><div class="event"><div class="event-title">运行工作区命令</div></div></div></details><div class="event"><div class="event-progress-text"><p>已回读到场景中的节点 JSON 和 Python 源码，版本均为 1.1.0，包含四个输出。工作流列表通过 <code>manifest.json</code> 的 <code>id</code>、<code>name</code>、<code>description</code> 读取清单；本次将新增该清单文件，注明版本、输入输出、节点依赖及 <code>graph.json</code> 入口。图文件将在下一次确认中单独提交。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">写入场景文件</div></div></div></details></div>
+      </details>
+      <!-- <div class="answer-label">正式回复</div> -->
+      <div class="answer"><p>已核实场景中的节点 JSON 与 Python 源码均已写入，版本为 <strong>1.1.0</strong>，包含四个输出。</p>
+<p>第 <strong>3/4</strong> 个文件已提交受限写入申请，<strong>尚未写入场景</strong>：</p>
+<table><thead><tr><th>项目</th><th>待确认内容</th></tr></thead><tbody><tr><td>文件</td><td><code>workflows/external_gear_pair/manifest.json</code></td></tr><tr><td>差异</td><td>新增 24 行，无旧文件被覆盖</td></tr><tr><td>工作流</td><td><code>external_gear_pair</code>，外啮合两齿轮传动计算</td></tr><tr><td>版本</td><td><code>1.1.0</code></td></tr><tr><td>内容</td><td>列表展示信息、三个输入、四个输出及单位、节点依赖、已验证算例</td></tr><tr><td>图入口</td><td>同目录 <code>graph.json</code>，将在下一次单独提交</td></tr></tbody></table>
+<p>完整新增差异已由本次写入申请展示。请通过前端确认，发送：</p>
+<pre><code class="language-text">approve_scene_write ed07579ed928c75b4aac44474b875082</code></pre>
+<p>确认后，我会核对工作流列表可读性，并提交最后一个文件 <code>workflows/external_gear_pair/graph.json</code>。</p>
+<p>当前暂停遵循你要求的逐文件确认及场景受限写入机制；工具返回 <code>requires_confirmation</code>，本次确认仅授权上述 manifest 文件。</p></div>
+      <button type="button" title="查看缓存中已录制的确认结果" onclick="this.closest('.turn').nextElementSibling.scrollIntoView({ behavior: 'smooth', block: 'start' })" style="margin-top: 6px; padding: 8px 20px; border: 0; border-radius: 6px; background: #2563eb; color: #fff; font: inherit; cursor: pointer;">确认</button>
+      <div class="actions" aria-label="回复操作">
+  <button class="icon-button" data-copy-response type="button" title="复制回复" aria-label="复制回复">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>
+  </button>
+  <button class="icon-button" type="button" title="缓存回放不支持重新生成" aria-label="重新生成不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"></path><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="赞不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Z"></path><path d="M7 10 12 3a3 3 0 0 1 2 3v4h5a2 2 0 0 1 2 2l-1.5 7a2 2 0 0 1-2 2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="踩不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Z"></path><path d="m7 14 5 7a3 3 0 0 0 2-3v-4h5a2 2 0 0 0 2-2l-1.5-7a2 2 0 0 0-2-2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不支持语音播放" aria-label="语音播放不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 5a10 10 0 0 1 0 14"></path></svg></button>
+  <button class="icon-button" type="button" title="分享功能在缓存回放中不可用" aria-label="分享不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"></path><path d="m7 8 5-5 5 5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg></button>
+  <span class="copy-status" aria-live="polite"></span>
+</div>
+    </div>
+  </article>
+</section>
+<section class="turn" aria-label="第 7 次缓存交互">
+  <div class="turn-heading"></div>
+  <div class="user-row"><div class="user-message"><p>已确认前端操作：审批场景写入</p>
+  <p><span class="sample-label"></span><code>approve_scene_write</code> <code>task_id=adf7a1b1ce4648a8b636b5f0622fbcba</code></p> <code>operation_id=ed07579ed928c75b4aac44474b875082</code></div></div>
+  <article class="assistant" aria-label="天枢回复">
+    <div class="assistant-mark" aria-hidden="true">天枢</div>
+    <div class="assistant-body">
+      <div class="assistant-name"> </div>
+      <details>
+        <summary>已思考执行 <span class="process-meta">已完成 · 3 次判断 · 3 次工具调用</span></summary>
+        <div class="timeline"><div class="event"><div class="event-title">场景修改已按用户确认应用</div><div class="event-detail"><code>status=applied</code> <code>operation_id=ed07579ed928c75b4aac44474b875082</code> <code>path=workflows/external_gear_pair/manifest.json</code></div></div><div class="event"><div class="event-progress-text"><p>第 3 个工作流清单文件已由后端应用。我会核对列表能否读取它，并检查已验证的编译图，然后提交最后一个文件 <code>workflows/external_gear_pair/graph.json</code> 的单独确认申请。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">列出场景工作流 </div></div><div class="event"><div class="event-title">读取工作区文件</div></div></div></details><div class="event"><div class="event-progress-text"><p>工作流列表已能读取“外啮合两齿轮传动计算”。最后一个文件将发布已验证编译图的 JSON 内容：包含 CGraph 执行结构、1.1.0 节点定义、20/40 齿与 1200 rpm 的示例参数，以及画布的开始、计算、结束节点和四条输出数据连接。图中的 <code>version: &quot;0.3&quot;</code> 是 CGraph 文档协议版本，节点业务版本仍为 <code>1.1.0</code>。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">写入场景文件</div></div></div></details></div>
+      </details>
+      <!-- <div class="answer-label">正式回复</div> -->
+      <div class="answer"><p>工作流列表已能读取 <code>external_gear_pair</code>（外啮合两齿轮传动计算）。第 <strong>4/4</strong> 个文件已提交受限写入申请，<strong>尚未写入场景</strong>。</p>
+<table><thead><tr><th>项目</th><th>待确认内容</th></tr></thead><tbody><tr><td>文件</td><td><code>workflows/external_gear_pair/graph.json</code></td></tr><tr><td>差异</td><td>新增 134 行，无旧文件被覆盖</td></tr><tr><td>节点业务版本</td><td><code>1.1.0</code></td></tr><tr><td>示例输入</td><td>主动轮 20 齿、从动轮 40 齿、主动轮 1200 rpm</td></tr><tr><td>输出</td><td>传动比、从动轮 rpm 幅值、相对方向、从动轮 rad/s 幅值</td></tr><tr><td>画布内容</td><td>开始 → 齿轮计算 → 结束，含四条输出数据连接</td></tr></tbody></table>
+<p>本次工具已展示新增差异，但由于长度限制，<strong>差异展示尾部被截断</strong>。文件完整内容已包含在写入申请中，待写入内容的 SHA-256 为：</p>
+<pre><code class="language-text">7a8222d50a86c720e64a14b2ff31b7b949ffa44a64b5605845aa649174700cdb</code></pre>
+<p>请通过前端确认，发送：</p>
+<pre><code class="language-text">approve_scene_write 917031dea1824d369e022ba06219eb0b</code></pre>
+<p>确认后，我会回读全部场景资产，核对版本、四个输出和图内容，再报告发布结果。当前工具返回 <code>requires_confirmation</code>，本次确认仅授权上述 <code>graph.json</code> 文件。</p></div>
+      <button type="button" title="查看缓存中已录制的确认结果" onclick="this.closest('.turn').nextElementSibling.scrollIntoView({ behavior: 'smooth', block: 'start' })" style="margin-top: 6px; padding: 8px 20px; border: 0; border-radius: 6px; background: #2563eb; color: #fff; font: inherit; cursor: pointer;">确认</button>
+      <div class="actions" aria-label="回复操作">
+  <button class="icon-button" data-copy-response type="button" title="复制回复" aria-label="复制回复">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>
+  </button>
+  <button class="icon-button" type="button" title="缓存回放不支持重新生成" aria-label="重新生成不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"></path><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="赞不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Z"></path><path d="M7 10 12 3a3 3 0 0 1 2 3v4h5a2 2 0 0 1 2 2l-1.5 7a2 2 0 0 1-2 2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="踩不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Z"></path><path d="m7 14 5 7a3 3 0 0 0 2-3v-4h5a2 2 0 0 0 2-2l-1.5-7a2 2 0 0 0-2-2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不支持语音播放" aria-label="语音播放不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 5a10 10 0 0 1 0 14"></path></svg></button>
+  <button class="icon-button" type="button" title="分享功能在缓存回放中不可用" aria-label="分享不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"></path><path d="m7 8 5-5 5 5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg></button>
+  <span class="copy-status" aria-live="polite"></span>
+</div>
+    </div>
+  </article>
+</section>
+<section class="turn" aria-label="第 8 次缓存交互">
+  <div class="turn-heading"></div>
+  <!-- <div class="user-row"><div class="user-message"><span class="sample-label">前端操作 · </span><code>approve_scene_write</code> <code>task_id=adf7a1b1ce4648a8b636b5f0622fbcba</code> <code>operation_id=917031dea1824d369e022ba06219eb0b</code></div></div> -->
+  <div class="user-row"><div class="user-message"><p>已确认前端操作：审批场景写入</p>
+  <p><span class="sample-label"></span><code>approve_scene_write</code> <code>task_id=adf7a1b1ce4648a8b636b5f0622fbcba</code></p> <code>operation_id=917031dea1824d369e022ba06219eb0b</code></div></div>
+
+  <article class="assistant" aria-label="天枢回复">
+    <div class="assistant-mark" aria-hidden="true">天枢</div>
+    <div class="assistant-body">
+      <div class="assistant-name"> </div>
+      <details>
+        <summary>已思考执行 <span class="process-meta">已完成 · 2 次判断 · 4 次工具调用</span></summary>
+        <div class="timeline"><div class="event"><div class="event-title">场景修改已按用户确认应用</div><div class="event-detail"><code>status=applied</code> <code>operation_id=917031dea1824d369e022ba06219eb0b</code> <code>path=workflows/external_gear_pair/graph.json</code></div></div><div class="event"><div class="event-progress-text"><p>最后一个图文件已由后端应用。我会通过场景读取接口回读节点和工作流，核对四个文件、1.1.0 版本及四个输出，并确认节点库与工作流列表均能发现这些资产。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">列出场景节点 </div></div><div class="event"><div class="event-title">列出场景工作流 </div></div><div class="event"><div class="event-title">读取场景节点</div></div><div class="event"><div class="event-title">读取场景工作流</div></div></div></details></div>
+      </details>
+      <!-- <div class="answer-label">正式回复</div> -->
+      <div class="answer"><p>已完成发布到测试场景 <strong><code>gearbox_e2e</code></strong>。四个文件均通过受限写入机制逐次确认并由后端应用，现已全部回读成功。</p>
+<table><thead><tr><th>场景资产</th><th>状态</th></tr></thead><tbody><tr><td><code>nodes/external_gear_pair.json</code></td><td>已写入，节点定义版本 <code>1.1.0</code></td></tr><tr><td><code>nodes/external_gear_pair.py</code></td><td>已写入，源码版本 <code>1.1.0</code></td></tr><tr><td><code>workflows/external_gear_pair/manifest.json</code></td><td>已写入，工作流版本 <code>1.1.0</code></td></tr><tr><td><code>workflows/external_gear_pair/graph.json</code></td><td>已写入，包含执行图和画布定义</td></tr></tbody></table>
+<p>发布后核对结果：</p>
+<ul><li><strong>节点库清单可发现</strong> <code>mechanical.external_gear_pair</code>，显示名为“外啮合两齿轮传动”。</li><li><strong>工作流列表可发现</strong> <code>external_gear_pair</code>，显示名为“外啮合两齿轮传动计算”。</li><li>节点定义、源码、工作流清单和图中均包含四个输出：<code>transmission_ratio</code>、<code>driven_speed_rpm</code>、<code>relative_direction</code>、<code>driven_angular_speed_rad_s</code>。</li><li>图保留了 <strong>20/40 齿、1200 rpm</strong> 示例输入，以及四个输出到结束节点的连接。</li></ul>
+<p>对应版本此前已通过 <strong>32 项 pytest、正式图加载、整图执行及全量工作区校验</strong>，实测结果为 <code>2.0</code>、<code>600.0 rpm</code>、<code>-1</code>、<code>62.83185307179586 rad/s</code>。</p>
+<p>本轮确认了场景资产落盘、列表发现及详情读取；尚未进行浏览器中的画布渲染和交互验证。</p></div>
+      <div class="actions" aria-label="回复操作">
+  <button class="icon-button" data-copy-response type="button" title="复制回复" aria-label="复制回复">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>
+  </button>
+  <button class="icon-button" type="button" title="缓存回放不支持重新生成" aria-label="重新生成不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"></path><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="赞不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Z"></path><path d="M7 10 12 3a3 3 0 0 1 2 3v4h5a2 2 0 0 1 2 2l-1.5 7a2 2 0 0 1-2 2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="踩不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Z"></path><path d="m7 14 5 7a3 3 0 0 0 2-3v-4h5a2 2 0 0 0 2-2l-1.5-7a2 2 0 0 0-2-2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不支持语音播放" aria-label="语音播放不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 5a10 10 0 0 1 0 14"></path></svg></button>
+  <button class="icon-button" type="button" title="分享功能在缓存回放中不可用" aria-label="分享不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"></path><path d="m7 8 5-5 5 5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg></button>
+  <span class="copy-status" aria-live="polite"></span>
+</div>
+    </div>
+  </article>
+</section>
+<section class="turn" aria-label="第 9 次缓存交互">
+  <div class="turn-heading"></div>
+  <div class="user-row"><div class="user-message">我现在在当前场景的工作流列表页，选中了刚发布的“外啮合两齿轮传动计算”。请基于当前场景资产，简要告诉我这个工作流的输入、输出和上次 20/40 齿、主动轮 1200 rpm 的实测结果；只查看，不修改任何文件。</div></div>
+  <article class="assistant" aria-label="天枢回复">
+    <div class="assistant-mark" aria-hidden="true">天枢</div>
+    <div class="assistant-body">
+      <div class="assistant-name"> </div>
+      <details>
+        <summary>已思考执行 <span class="process-meta">已完成 · 2 次判断 · 1 次工具调用</span></summary>
+        <div class="timeline"><div class="event"><div class="event-progress-text"><p>我会只读当前选中的场景工作流，核对输入、输出及其中记录的上次实测结果，不修改文件。</p></div></div><details class="tool-group"><summary>开始执行工作区工具</summary><div class="timeline"><div class="event"><div class="event-title">读取场景工作流</div></div></div></details></div>
+      </details>
+      <!-- <div class="answer-label">正式回复</div> -->
+      <div class="answer"><p>已只读核对当前场景 <code>gearbox_e2e</code> 的“<strong>外啮合两齿轮传动计算</strong>”，版本 <strong>1.1.0</strong>。</p>
+<p>输入为：</p>
+<ul><li><code>driver_teeth</code>：主动轮齿数，无单位正整数。</li><li><code>driven_teeth</code>：从动轮齿数，无单位正整数。</li><li><code>driver_speed_rpm</code>：主动轮转速幅值，有限非负数，单位 rpm。</li></ul>
+<p>场景资产记录的上次 <strong>20/40 齿、主动轮 1200 rpm</strong> 整图实测结果为：</p>
+<table><thead><tr><th>输出</th><th>含义</th><th>实测值</th></tr></thead><tbody><tr><td><code>transmission_ratio</code></td><td>从动轮齿数 ÷ 主动轮齿数</td><td><strong>2.0</strong></td></tr><tr><td><code>driven_speed_rpm</code></td><td>从动轮转速幅值</td><td><strong>600.0 rpm</strong></td></tr><tr><td><code>relative_direction</code></td><td>相对主动轮的方向关系</td><td><strong>-1（反向）</strong></td></tr><tr><td><code>driven_angular_speed_rad_s</code></td><td>从动轮角速度幅值，按 rpm × <math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mn>60</mn></mfrac></math> 换算</td><td><strong>62.83185307179586 rad/s</strong></td></tr></tbody></table>
+<p>该工作流采用理想外啮合模型，忽略效率、载荷和滑移。本轮未重新执行，也未修改任何文件。</p></div>
+      <div class="actions" aria-label="回复操作">
+  <button class="icon-button" data-copy-response type="button" title="复制回复" aria-label="复制回复">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path></svg>
+  </button>
+  <button class="icon-button" type="button" title="缓存回放不支持重新生成" aria-label="重新生成不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"></path><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="赞不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Z"></path><path d="M7 10 12 3a3 3 0 0 1 2 3v4h5a2 2 0 0 1 2 2l-1.5 7a2 2 0 0 1-2 2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不提交反馈" aria-label="踩不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Z"></path><path d="m7 14 5 7a3 3 0 0 0 2-3v-4h5a2 2 0 0 0 2-2l-1.5-7a2 2 0 0 0-2-2H7"></path></svg></button>
+  <button class="icon-button" type="button" title="缓存回放不支持语音播放" aria-label="语音播放不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9a5 5 0 0 1 0 6"></path><path d="M18 5a10 10 0 0 1 0 14"></path></svg></button>
+  <button class="icon-button" type="button" title="分享功能在缓存回放中不可用" aria-label="分享不可用" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3"></path><path d="m7 8 5-5 5 5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg></button>
+  <span class="copy-status" aria-live="polite"></span>
+</div>
+    </div>
+  </article>
+</section>
+<!-- RECORDED_INTERACTIONS_END -->
+  </main>
+  <dialog class="skill-dialog" aria-labelledby="skill-dialog-title">
+    <div class="skill-dialog-header">
+      <strong id="skill-dialog-title">Skill 正文</strong>
+      <button class="icon-button" type="button" data-close-skill title="关闭" aria-label="关闭 Skill 正文">×</button>
+    </div>
+    <pre></pre>
+  </dialog>
+  <script>
+    async function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+      const temporary = document.createElement('textarea');
+      temporary.value = text;
+      temporary.setAttribute('readonly', '');
+      temporary.style.position = 'fixed';
+      temporary.style.opacity = '0';
+      document.body.appendChild(temporary);
+      temporary.select();
+      const copied = document.execCommand('copy');
+      temporary.remove();
+      if (!copied) throw new Error('clipboard unavailable');
+    }
+
+    document.querySelectorAll('[data-copy-response]').forEach((copyButton) => {
+      const assistant = copyButton.closest('.assistant-body');
+      const answer = assistant.querySelector('.answer');
+      const copyStatus = assistant.querySelector('.copy-status');
+
+      copyButton.addEventListener('click', async () => {
+        try {
+          const cleanAnswer = answer.cloneNode(true);
+          cleanAnswer.querySelectorAll('.code-header').forEach((header) => header.remove());
+          await copyText(cleanAnswer.innerText);
+          copyStatus.textContent = '已复制';
+          copyButton.title = '已复制';
+          window.setTimeout(() => {
+            copyStatus.textContent = '';
+            copyButton.title = '复制回复';
+          }, 1800);
+        } catch {
+          copyStatus.textContent = '复制失败';
+        }
+      });
+    });
+
+    document.querySelectorAll('.code-block').forEach((block, index) => {
+      const code = block.querySelector('pre code');
+      const copyButton = block.querySelector('[data-copy-code]');
+      const downloadButton = block.querySelector('[data-download-code]');
+      copyButton.addEventListener('click', async () => {
+        try {
+          await copyText(code.textContent);
+          copyButton.lastChild.textContent = '已复制';
+          window.setTimeout(() => { copyButton.lastChild.textContent = '复制'; }, 1800);
+        } catch {
+          copyButton.lastChild.textContent = '复制失败';
+        }
+      });
+      downloadButton.addEventListener('click', () => {
+        const blob = new Blob([code.textContent + '\n'], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `gearbox-result-${index + 1}.json`;
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      });
+    });
+
+    const skillDialog = document.querySelector('.skill-dialog');
+    const skillDialogTitle = skillDialog.querySelector('#skill-dialog-title');
+    const skillDialogBody = skillDialog.querySelector('pre');
+    const closeSkillButton = skillDialog.querySelector('[data-close-skill]');
+    let lastSkillTrigger = null;
+
+    function closeSkillMenus() {
+      document.querySelectorAll('.skill-action').forEach((action) => {
+        action.querySelector('.skill-menu').hidden = true;
+        action.querySelector('.skill-trigger').setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    document.querySelectorAll('.skill-action').forEach((action) => {
+      const trigger = action.querySelector('.skill-trigger');
+      const menu = action.querySelector('.skill-menu');
+      const assistant = action.closest('.assistant-body');
+      assistant.querySelectorAll('.skill-details .skill-body').forEach((body) => {
+        const name = body.textContent.match(/^name:\s*(.+)$/m)?.[1]?.trim() || 'Skill';
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.textContent = name;
+        item.addEventListener('click', () => {
+          closeSkillMenus();
+          lastSkillTrigger = trigger;
+          skillDialogTitle.textContent = name;
+          skillDialogBody.textContent = body.textContent;
+          skillDialog.showModal();
+          closeSkillButton.focus();
+        });
+        menu.appendChild(item);
+      });
+      trigger.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const willOpen = menu.hidden;
+        closeSkillMenus();
+        menu.hidden = !willOpen;
+        trigger.setAttribute('aria-expanded', String(willOpen));
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.skill-action')) closeSkillMenus();
+    });
+    closeSkillButton.addEventListener('click', () => skillDialog.close());
+    skillDialog.addEventListener('click', (event) => {
+      if (event.target === skillDialog) skillDialog.close();
+    });
+    skillDialog.addEventListener('close', () => lastSkillTrigger?.focus());
+  </script>
+</body>
+</html>
