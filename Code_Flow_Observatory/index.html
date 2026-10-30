@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f8ff" />
+    <meta name="description" content="Code Flow Observatory · 代码链路学习与运行复盘工作台" />
+    <title>Code Flow Observatory</title>
+    <link rel="stylesheet" href="./styles.css?v=20261023-real-prefix" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="主导航">
+        <a class="brand" href="#flow" data-page="flow" aria-label="返回流程复盘">
+          <span class="brand-mark"><span>✳</span></span>
+          <span class="brand-copy"><strong>Code Flow</strong><small>OBSERVATORY</small></span>
+        </a>
+
+        <div class="sidebar-caption">工作区</div>
+        <div class="repo-mini-card">
+          <span class="repo-mini-icon">⌘</span>
+          <span class="repo-mini-copy"><strong id="sidebarRepoName">EchoOS Agent</strong><small>演示仓库</small></span>
+          <span class="online-dot" title="演示数据已加载"></span>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-item" data-page="overview" aria-label="学习总览" title="学习总览"><span class="nav-icon">▦</span><span>学习总览</span></button>
+          <button class="nav-item active" data-page="flow" aria-label="流程复盘" title="流程复盘"><span class="nav-icon">⌁</span><span>流程复盘</span><span class="nav-count">03</span></button>
+          <button class="nav-item" data-page="library" aria-label="代码卡片库" title="代码卡片库"><span class="nav-icon">▤</span><span>代码卡片库</span></button>
+          <button class="nav-item" data-page="compare" aria-label="版本对比" title="版本对比"><span class="nav-icon">⇄</span><span>版本对比</span><span class="nav-new">NEW</span></button>
+          <button class="nav-item" data-page="notes" aria-label="学习笔记" title="学习笔记"><span class="nav-icon">✎</span><span>学习笔记</span></button>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-tip">
+          <span class="tip-spark">✦</span>
+          <strong>每条链路，读懂一点</strong>
+          <p>把运行步骤和源码卡片连起来，慢慢建立自己的代码地图。</p>
+        </div>
+        <div class="sidebar-footer"><span class="footer-pulse"></span>本地演示环境 <span class="footer-version">prototype 0.1</span></div>
+      </aside>
+
+      <main class="main-area">
+        <header class="topbar">
+          <div class="mobile-brand"><span class="brand-mark small"><span>✳</span></span><strong>Code Flow</strong></div>
+          <div class="breadcrumbs"><span>学习工作台</span><span class="crumb-slash">/</span><strong id="breadcrumbCurrent">流程复盘</strong></div>
+          <div class="topbar-actions">
+            <label class="select-wrap repo-select-wrap" aria-label="选择代码仓库">
+              <span class="select-icon">⌘</span>
+              <select id="repositorySelect" aria-label="选择代码仓库"></select>
+              <span class="select-chevron">⌄</span>
+            </label>
+            <label class="select-wrap snapshot-select-wrap" aria-label="选择代码版本">
+              <span class="snapshot-dot"></span>
+              <select id="snapshotSelect" aria-label="选择代码版本"></select>
+              <span class="select-chevron">⌄</span>
+            </label>
+            <button class="icon-action search-open" data-action="focus-search" aria-label="搜索" title="搜索">⌕</button>
+            <button class="present-button" data-action="presentation"><span>↗</span> 演示模式</button>
+          </div>
+        </header>
+
+        <div class="demo-banner">
+          <span class="demo-banner-icon">✦</span>
+          <span><strong>原型演示 · 页面内容均为假数据</strong><span class="demo-banner-detail">源码、运行步骤和统计仅用于展示交互，不代表任何真实仓库或运行记录。</span></span>
+        </div>
+
+        <section id="pageContent" class="page-content" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <div class="search-overlay" id="searchOverlay" hidden>
+      <div class="search-dialog" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+        <div class="search-dialog-top"><span>⌕</span><input id="globalSearch" type="search" placeholder="搜索流程、函数、文件或解释…" autocomplete="off" /><kbd>ESC</kbd></div>
+        <h2 id="searchTitle">快速跳转</h2>
+        <div id="searchResults" class="search-results"><p class="search-hint">输入关键词，搜索当前演示仓库中的流程和卡片。</p></div>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./app.js?v=20261023-real-prefix"></script>
+  </body>
+</html>
