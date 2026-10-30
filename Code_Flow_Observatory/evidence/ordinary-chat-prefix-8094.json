@@ -1,0 +1,196 @@
+{
+  "hit": [
+    {
+      "file": "application/context/pipeline.py",
+      "line": 52,
+      "request_id": "cfo-prefix-8094-37467f4",
+      "session_id": "debug-cfo",
+      "user_id": "2113153353906343938",
+      "prompt": "你好，请简要说明你能帮我做什么。",
+      "ui_context_keys": [
+        "page",
+        "visible"
+      ],
+      "recent_turn_count": 0,
+      "has_active_task": false,
+      "has_task_projection": false
+    }
+  ],
+  "calls": [
+    {
+      "file": "middleware/auth_middleware.py",
+      "function": "__call__",
+      "line": 33
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 95
+    },
+    {
+      "file": "integrations/realtime/ws_session_broker.py",
+      "function": "connect",
+      "line": 21
+    },
+    {
+      "file": "middleware/auth_middleware.py",
+      "function": "__call__",
+      "line": 33
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 95
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 188
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 181
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_register_active_task",
+      "line": 119
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_after_registration",
+      "line": 346
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 200
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_safe_send_json",
+      "line": 181
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 258
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 188
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 181
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 369
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "list_recent",
+      "line": 44
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 82
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "list_recent_events",
+      "line": 65
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 82
+    },
+    {
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 34
+    },
+    {
+      "file": "application/memory/session_memory_builder.py",
+      "function": "_find_active_task",
+      "line": 54
+    },
+    {
+      "file": "application/memory/event_projector.py",
+      "function": "build",
+      "line": 18
+    },
+    {
+      "file": "application/runtime/events.py",
+      "function": "now_utc_iso",
+      "line": 15
+    },
+    {
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 21
+    },
+    {
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 250
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_append_memory_event",
+      "line": 681
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "append_event",
+      "line": 55
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 82
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "<lambda>",
+      "line": 31
+    },
+    {
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 34
+    }
+  ],
+  "capture": {
+    "source": "Temporary uvicorn service bound to 0.0.0.0:8094; real WebSocket request to ws://172.20.163.11:8094/ws/sessions/debug-cfo",
+    "commit": "37467f44cba35cd23036af3530f861a398fb130d",
+    "branch": "develop_echo",
+    "timestamp_local": "2026-10-23 17:05 Asia/Shanghai",
+    "auth": "disabled only in temporary capture process",
+    "ui_context": {
+      "page": "workflow_canvas_page",
+      "visible": {
+        "page_state": {}
+      }
+    },
+    "stopped_before": "application/context/pipeline.py:52",
+    "client_messages": [
+      {
+        "type": "chat_ack",
+        "status": "accepted"
+      },
+      {
+        "type": "chat_error",
+        "cause": "trace callback intentionally raised StopBeforeValidation; not a business error"
+      }
+    ],
+    "trace_semantics": "Python call events include async coroutine resumptions; source snippets are excerpts, not line-by-line execution proof."
+  }
+}
