@@ -1,0 +1,13 @@
+{
+  "verifiedComplete": false,
+  "pages": [
+    { "file": "知识候选-修改并保存.png", "id": "knowledge-edit-save", "title": "知识候选 · 修改并保存", "category": "知识候选", "order": 1 },
+    { "file": "知识候选-详情展示.png", "id": "knowledge-detail", "title": "知识候选 · 详情展示", "category": "知识候选", "order": 2 },
+    { "file": "正文回复-生成知识候选.png", "id": "reply-knowledge-candidate", "title": "正文回复 · 生成知识候选", "category": "正文回复", "order": 3 },
+    { "file": "正文回复-确认场景文件写入.png", "id": "reply-confirm-scene-write", "title": "正文回复 · 确认场景文件写入", "category": "正文回复", "order": 4 },
+    { "file": "正文回复-普通交互.png", "id": "reply-standard", "title": "正文回复 · 普通交互", "category": "正文回复", "order": 5 },
+    { "file": "正在思考执行-所有进度情况.png", "id": "thinking-all-progress", "title": "正在思考执行 · 所有进度情况", "category": "正在思考执行", "order": 6 },
+    { "file": "正在思考执行-展开.png", "id": "thinking-expanded", "title": "正在思考执行 · 展开", "category": "正在思考执行", "order": 7 },
+    { "file": "正在思考执行-折叠.png", "id": "thinking-collapsed", "title": "正在思考执行 · 折叠", "category": "正在思考执行", "order": 8 }
+  ]
+}
