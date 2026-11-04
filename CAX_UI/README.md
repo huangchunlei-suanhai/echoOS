@@ -2,6 +2,8 @@
 
 韶峰天工中 AI 助手天枢聊天界面设计。设计师：echo；职责：独立完成；设计时间：2026 年 9 月起；设计版本：9.30、新版。
 
+公开浏览地址：https://huangchunlei-suanhai.github.io/echoOS/
+
 ## 当前状态
 
 9.30 版本已接入用户提供的 **17 张真实 PNG**：研发阶段 8 张、执行进度 5 张、详情弹窗 4 张。已按流程排列，保留原始文件并生成顶部预览缩略图。长弹窗默认适应宽度，可滚动阅读，也可以切换为整图预览。
@@ -68,13 +70,13 @@ npm run dev
 ## 构建与部署
 
 ```powershell
-npm run build
+npm run build -- --base=./
 npm run preview
 ```
 
-将 `dist/` 部署到支持 HTTPS 的静态托管平台，构建命令 `npm run build`、输出目录 `dist`，项目根目录设置为 `CAX_UI`。源码和构建产物分开管理。
+当前公开站点由 GitHub Pages 托管，源码位于 `develop` 分支的 `CAX_UI/`，`dist/` 内容发布在 `gh-pages` 分支根目录。更新页面后需要重新构建并更新该发布分支；只推送源码不会自动更新公网网站。
 
-若部署在 `/CAX_UI/` 子路径：
+若另行部署在 `/CAX_UI/` 子路径：
 
 ```powershell
 npm run build -- --base=/CAX_UI/
