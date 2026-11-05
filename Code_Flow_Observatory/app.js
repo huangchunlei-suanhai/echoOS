@@ -1,7 +1,19 @@
 import { REPOSITORIES as DEMO_REPOSITORIES, SNAPSHOT_DIFFS, SNAPSHOT_SOURCE_VARIANTS } from "./mock-data.js";
 import { REAL_REPOSITORY } from "./real-data.js";
+import { UPDATA_SNAPSHOT } from "./updata-data.js";
+import { UPDATA_CONTINUATION } from "./continuation-data.js";
 
-const REPOSITORIES = [REAL_REPOSITORY, DEMO_REPOSITORIES[0]];
+const CURRENT_UPDATA_SNAPSHOT = { ...UPDATA_SNAPSHOT.snapshot, ...UPDATA_CONTINUATION.snapshot };
+
+const UPDATED_REAL_REPOSITORY = {
+  ...REAL_REPOSITORY,
+  snapshots: [CURRENT_UPDATA_SNAPSHOT, ...REAL_REPOSITORY.snapshots],
+  scenarios: REAL_REPOSITORY.scenarios.map((item) => ({
+    ...item,
+    runs: [UPDATA_CONTINUATION.run, UPDATA_SNAPSHOT.run, ...item.runs],
+  })),
+};
+const REPOSITORIES = [UPDATED_REAL_REPOSITORY, DEMO_REPOSITORIES[0]];
 
 const state = {
   page: "flow",
@@ -25,9 +37,17 @@ const repo = () => REPOSITORIES.find((item) => item.id === state.repositoryId) |
 const isReal = () => repo().kind === "real";
 const snapshot = () => repo().snapshots.find((item) => item.id === state.snapshotId) || repo().snapshots[0];
 const scenario = () => repo().scenarios.find((item) => item.id === state.scenarioId) || repo().scenarios[0];
+const hasNewSnapshot = () => isReal() && state.snapshotId === UPDATA_SNAPSHOT.snapshot.id;
+const stepsFor = (item) => hasNewSnapshot() && item.id === REAL_REPOSITORY.scenarios[0].id ? UPDATA_CONTINUATION.steps : item.steps;
+const snapshotSteps = () => stepsFor(scenario());
+const baseCards = () => hasNewSnapshot() ? [...repo().cards, ...UPDATA_SNAPSHOT.additions, ...UPDATA_CONTINUATION.additions] : repo().cards;
 const runsForSnapshot = () => scenario().runs.filter((item) => item.snapshotId === state.snapshotId);
 const currentRun = () => runsForSnapshot().find((item) => item.id === state.runId) || runsForSnapshot()[0];
-const activeSteps = () => scenario().steps.slice(0, currentRun().stepCount ?? scenario().steps.length);
+const runSteps = () => hasNewSnapshot() && currentRun().id === UPDATA_SNAPSHOT.run.id ? UPDATA_SNAPSHOT.steps : snapshotSteps();
+const activeSteps = () => runSteps().slice(0, currentRun().stepCount ?? runSteps().length);
+const runBoundary = () => hasNewSnapshot() && currentRun().id === UPDATA_SNAPSHOT.run.id
+  ? { file: "pipeline.py", line: 53 }
+  : { file: snapshot().breakpointFile || "pipeline.py", line: snapshot().breakpointLine || 52 };
 const selectedStep = () => activeSteps()[Math.min(state.stepIndex, activeSteps().length - 1)];
 const flowCard = () => cardFor((selectedStep().cardIds || [selectedStep().cardId]).includes(state.flowCardId) ? state.flowCardId : selectedStep().cardId);
 const reviewStorageKey = () => `cfo-card-reviews-v1-${repo().id}-${snapshot().id}`;
@@ -64,13 +84,14 @@ function saveReview(id, changes) {
   }
 }
 const cardFor = (id) => {
-  const base = repo().cards.find((item) => item.id === id) || repo().cards[0];
+  const base = baseCards().find((item) => item.id === id) || baseCards()[0];
   const source = SNAPSHOT_SOURCE_VARIANTS[repo().id]?.[snapshot().id]?.[base.id];
+  const overlay = hasNewSnapshot() ? UPDATA_SNAPSHOT.overrides[base.id] || {} : {};
   const review = reviewFor(base.id);
   const explanation = Object.fromEntries(reviewFields.filter((field) => typeof review[field] === "string").map((field) => [field, review[field]]));
-  return { ...base, ...(source ? { source } : {}), ...explanation };
+  return { ...base, ...overlay, ...(source ? { source } : {}), ...explanation };
 };
-const cardsForSnapshot = () => repo().cards.map((item) => cardFor(item.id));
+const cardsForSnapshot = () => baseCards().map((item) => cardFor(item.id));
 const bookmarks = () => new Set(JSON.parse(localStorage.getItem(`cfo-bookmarks-${repo().id}`) || "[]"));
 
 function syntaxLine(line) {
@@ -96,7 +117,7 @@ function syntaxLine(line) {
 function renderSource(item, compact = false) {
   const lines = item.source.split("\n");
   const start = Number(item.lineStart) || 1;
-  return `<div class="code-scroll ${compact ? "compact" : ""}"><pre class="code-block" aria-label="${isReal() ? "固定提交源码片段" : "演示源码"}">${lines.map((line, index) => { const number = start + index; const boundary = isReal() && item.id === "context-boundary" && number === 52; return `<span class="code-line ${number === (item.focusLine || start) ? "line-focus" : ""} ${boundary ? "line-breakpoint" : ""}"><span class="line-number">${number}</span><code>${syntaxLine(line) || " "}</code>${boundary ? '<span class="code-boundary-label">执行前停止</span>' : ""}</span>`; }).join("")}</pre></div>`;
+  return `<div class="code-scroll ${compact ? "compact" : ""}"><pre class="code-block" aria-label="${isReal() ? "固定提交源码片段" : "演示源码"}">${lines.map((line, index) => { const number = start + index; const boundary = isReal() && ["context-boundary", "trace-record-boundary"].includes(item.id) && number === item.focusLine; return `<span class="code-line ${number === (item.focusLine || start) ? "line-focus" : ""} ${boundary ? "line-breakpoint" : ""}"><span class="line-number">${number}</span><code>${syntaxLine(line) || " "}</code>${boundary ? '<span class="code-boundary-label">执行前停止</span>' : ""}</span>`; }).join("")}</pre></div>`;
 }
 
 function syncHeader() {
@@ -112,7 +133,7 @@ function syncHeader() {
   banner.classList.toggle("real-banner", isReal());
   banner.querySelector("strong").textContent = isReal() ? "真实仓库 · 8094 断点前采集" : "原型演示 · 页面内容均为假数据";
   banner.querySelector(".demo-banner-detail").textContent = isReal()
-    ? "固定提交 37467f4；本次请求在 pipeline.py:52 执行前停止。说明待人工审核，收录范围仅此局部链路。"
+    ? "固定提交 " + snapshot().commit.slice(0, 7) + "；本次请求在 " + runBoundary().file + ":" + runBoundary().line + " 执行前停止。说明待人工审核，收录范围仅此局部链路。"
     : "源码、运行步骤和统计仅用于展示交互，不代表任何真实仓库或运行记录。";
   byId("breadcrumbCurrent").textContent = pageNames[state.page];
   document.querySelector(".nav-count").textContent = String(repo().scenarios.length).padStart(2, "0");
@@ -139,30 +160,30 @@ function render() {
 }
 
 function renderOverview() {
-  const allSteps = repo().scenarios.reduce((sum, item) => sum + item.steps.length, 0);
-  const reviewed = repo().cards.filter((item) => reviewFor(item.id).status === "reviewed").length;
+  const allSteps = repo().scenarios.reduce((sum, item) => sum + stepsFor(item).length, 0);
+  const reviewed = cardsForSnapshot().filter((item) => reviewFor(item.id).status === "reviewed").length;
   const focusScenario = repo().scenarios[0];
   const resumeStepIndex = isReal() ? 0 : 4;
-  const progress = Math.round(((resumeStepIndex + 1) / focusScenario.steps.length) * 100);
-  const focusLabels = isReal() ? ["握手", "ACK", "记忆", "L52"] : ["入口", "校验", "协调", "Agent"];
+  const progress = Math.round(((resumeStepIndex + 1) / stepsFor(focusScenario).length) * 100);
+  const focusLabels = isReal() ? ["握手", "ACK", "记忆", "L" + runBoundary().line] : ["入口", "校验", "协调", "Agent"];
   return `
     <div class="page-heading overview-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>YOUR LEARNING SPACE</div><h1>嗨，今天想读哪条链路？ <span class="heading-wave">✦</span></h1><p class="page-lede">从一次运行开始，把分散在仓库里的代码慢慢串起来。</p></div><button class="button-primary" data-page="flow"><span>⌁</span> 继续流程复盘</button></div>
     <div class="metric-grid">
       <article class="metric-card metric-cyan"><span class="metric-icon">⌘</span><span class="metric-label">当前仓库</span><strong>${escapeHtml(repo().shortName)}</strong><small>${repo().language} · ${repo().snapshots.length} 个代码快照</small><span class="metric-orb"></span></article>
-      <article class="metric-card metric-lilac"><span class="metric-icon">▤</span><span class="metric-label">${isReal() ? "断点前源码卡片" : "演示解释卡片"}</span><strong>${repo().cards.length}<small> 张</small></strong><small>${isReal() ? "固定提交源码，说明待人工核对" : "待人工确认的假数据"}</small><span class="metric-orb"></span></article>
+      <article class="metric-card metric-lilac"><span class="metric-icon">▤</span><span class="metric-label">${isReal() ? "断点前源码卡片" : "演示解释卡片"}</span><strong>${cardsForSnapshot().length}<small> 张</small></strong><small>${isReal() ? "固定提交源码，说明待人工核对" : "待人工确认的假数据"}</small><span class="metric-orb"></span></article>
       <article class="metric-card metric-peach"><span class="metric-icon">⌁</span><span class="metric-label">学习场景</span><strong>${repo().scenarios.length}<small> 条</small></strong><small>共 ${allSteps} 个${isReal() ? "采集步骤" : "演示步骤"}</small><span class="metric-orb"></span></article>
-      <article class="metric-card metric-green"><span class="metric-icon">✓</span><span class="metric-label">说明已审核</span><strong>${reviewed}<small> / ${repo().cards.length}</small></strong><small>当前浏览器的${isReal() ? "人工审核记录" : "演示审核记录"}</small><span class="metric-orb"></span></article>
+      <article class="metric-card metric-green"><span class="metric-icon">✓</span><span class="metric-label">说明已审核</span><strong>${reviewed}<small> / ${cardsForSnapshot().length}</small></strong><small>当前浏览器的${isReal() ? "人工审核记录" : "演示审核记录"}</small><span class="metric-orb"></span></article>
     </div>
     <div class="overview-grid">
       <section class="panel recent-panel"><div class="panel-title-row"><div><span class="section-kicker">PICK UP WHERE YOU LEFT OFF</span><h2>最近学习的场景</h2></div><button class="text-button" data-page="flow">查看全部 <span>→</span></button></div>
-        <div class="scenario-list">${repo().scenarios.map((item, index) => { const activeRun = item.runs.find((run) => run.snapshotId === state.snapshotId); return `<button class="scenario-row" data-page="flow" data-scenario="${item.id}"><span class="scenario-index index-${index}">0${index + 1}</span><span class="scenario-row-copy"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.kind)} · ${item.steps.length} 个步骤 · ${escapeHtml(activeRun.date)}</small></span><span class="status-chip status-${activeRun.status}">${escapeHtml(activeRun.state)}</span><span class="row-arrow">↗</span></button>`; }).join("")}</div>
+        <div class="scenario-list">${repo().scenarios.map((item, index) => { const activeRun = item.runs.find((run) => run.snapshotId === state.snapshotId); return `<button class="scenario-row" data-page="flow" data-scenario="${item.id}"><span class="scenario-index index-${index}">0${index + 1}</span><span class="scenario-row-copy"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.kind)} · ${stepsFor(item).length} 个步骤 · ${escapeHtml(activeRun.date)}</small></span><span class="status-chip status-${activeRun.status}">${escapeHtml(activeRun.state)}</span><span class="row-arrow">↗</span></button>`; }).join("")}</div>
       </section>
       <section class="panel focus-panel"><div class="panel-title-row"><div><span class="section-kicker">LEARNING FOCUS</span><h2>这条链路的${isReal() ? "阅读进度" : "演示阅读进度"}</h2></div><span class="focus-emoji">✦</span></div>
         <div class="focus-flow">${focusLabels.map((label, index) => `${index ? "<i></i>" : ""}<span class="focus-node ${isReal() ? (index === 0 ? "current" : "") : (index < 2 ? "done" : index === 2 ? "current" : "")}">${label}</span>`).join("")}</div>
-        <div class="progress-label"><span>${escapeHtml(focusScenario.name)}</span><strong>${progress}%</strong></div><div class="progress-track"><span style="width:${progress}%"></span></div><p class="focus-note">继续查看 <b>${escapeHtml(focusScenario.steps[resumeStepIndex].label)}</b>。</p><button class="button-soft" data-page="flow" data-scenario="${focusScenario.id}" data-step-target="${resumeStepIndex}">接着读 <span>→</span></button>
+        <div class="progress-label"><span>${escapeHtml(focusScenario.name)}</span><strong>${progress}%</strong></div><div class="progress-track"><span style="width:${progress}%"></span></div><p class="focus-note">继续查看 <b>${escapeHtml(stepsFor(focusScenario)[resumeStepIndex].label)}</b>。</p><button class="button-soft" data-page="flow" data-scenario="${focusScenario.id}" data-step-target="${resumeStepIndex}">接着读 <span>→</span></button>
       </section>
     </div>
-    <section class="panel quick-library"><div class="panel-title-row"><div><span class="section-kicker">RECENT CARDS</span><h2>最近打开的代码卡片</h2></div><button class="text-button" data-page="library">进入卡片库 <span>→</span></button></div><div class="mini-card-grid">${repo().cards.slice(0, 3).map((item) => `<button class="mini-code-card ${item.color}" data-card="${item.id}"><span class="mini-card-type">${escapeHtml(item.type)}</span><strong>${escapeHtml(item.symbol)}</strong><small>${escapeHtml(item.file.split("/").slice(-1)[0])}</small><span class="mini-card-arrow">↗</span></button>`).join("")}</div></section>`;
+    <section class="panel quick-library"><div class="panel-title-row"><div><span class="section-kicker">RECENT CARDS</span><h2>最近打开的代码卡片</h2></div><button class="text-button" data-page="library">进入卡片库 <span>→</span></button></div><div class="mini-card-grid">${cardsForSnapshot().slice(0, 3).map((item) => `<button class="mini-code-card ${item.color}" data-card="${item.id}"><span class="mini-card-type">${escapeHtml(item.type)}</span><strong>${escapeHtml(item.symbol)}</strong><small>${escapeHtml(item.file.split("/").slice(-1)[0])}</small><span class="mini-card-arrow">↗</span></button>`).join("")}</div></section>`;
 }
 
 function renderFlow() {
@@ -174,15 +195,15 @@ function renderFlow() {
   const activeCardReviewed = reviewFor(activeCard.id).status === "reviewed";
   const selectedRunId = run.id;
   return `
-    <div class="page-heading flow-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>TRACE PLAYGROUND <span class="eyebrow-pill">${isReal() ? "8094 实测 · 局部链路" : "演示链路"}</span></div><h1>${escapeHtml(activeScenario.name)} <span class="heading-spark">✦</span></h1><p class="page-lede">${isReal() ? "从 WebSocket 入口复盘到 pipeline.py:52 执行前；每一步可切换关联源码卡片。" : "沿着演示链路的阅读节奏，一步步看见代码做了什么。"}</p></div><div class="heading-actions"><button class="button-secondary" data-action="export"><span>↓</span> 导出记录</button><button class="button-primary" data-action="presentation"><span>↗</span> 演示模式</button></div></div>
+    <div class="page-heading flow-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>TRACE PLAYGROUND <span class="eyebrow-pill">${isReal() ? "8094 实测 · 局部链路" : "演示链路"}</span></div><h1>${escapeHtml(activeScenario.name)} <span class="heading-spark">✦</span></h1><p class="page-lede">${isReal() ? "从 WebSocket 入口复盘到 " + runBoundary().file + ":" + runBoundary().line + " 执行前；每一步可切换关联源码卡片。" : "沿着演示链路的阅读节奏，一步步看见代码做了什么。"}</p></div><div class="heading-actions"><button class="button-secondary" data-action="export"><span>↓</span> 导出记录</button><button class="button-primary" data-action="presentation"><span>↗</span> 演示模式</button></div></div>
     <div class="flow-toolbar"><div class="scenario-tabs">${repo().scenarios.map((item) => `<button class="scenario-tab ${item.id === activeScenario.id ? "selected" : ""}" data-scenario="${item.id}"><span class="tab-dot"></span>${escapeHtml(item.name)}</button>`).join("")}</div><label class="run-picker"><span>运行记录</span><select id="runSelect">${runsForSnapshot().map((item) => `<option value="${item.id}" ${item.id === selectedRunId ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select><span class="select-chevron">⌄</span></label></div>
     <section class="run-context panel"><div class="context-prompt"><span class="prompt-avatar">你</span><div><span class="context-label">用户输入 <i>·</i> ${escapeHtml(run.date)}</span><p>“${escapeHtml(activeScenario.prompt)}”</p></div></div><div class="context-divider"></div><div class="context-result"><span class="result-icon">✦</span><div><span class="context-label">${isReal() || run.status === "partial" ? "采集结果" : "最终结果"} <i>·</i> ${escapeHtml(run.state)}</span><p>${isReal() ? escapeHtml(run.result) : run.status === "partial" ? "客户端连接中断，未采集到最终回复；不能据此判断后端请求失败。" : escapeHtml(run.response ?? activeScenario.response)}</p></div></div><div class="run-summary-meta"><span class="status-chip status-${run.status}"><i></i>${escapeHtml(run.state)}</span><span>◷ ${escapeHtml(run.duration)}</span><span>⌘ ${escapeHtml(snapshot().commit.slice(0, 7))}</span></div></section>
-    ${isReal() ? `<div class="capture-facts panel"><strong>本次采集范围</strong><span>请求 ${escapeHtml(run.requestId)} · 会话 ${escapeHtml(run.sessionId)} · 用户 ${escapeHtml(run.userId)}</span><span>${escapeHtml(run.uiContext)}</span><span>临时服务仅本次关闭鉴权；Python 函数追踪不等于逐行覆盖。<a href="./${escapeHtml(run.traceFile)}" target="_blank" rel="noopener">查看原始采集记录 ↗</a></span></div>` : ""}
+    ${isReal() ? `<div class="capture-facts panel"><strong>本次采集范围</strong><span>请求 ${escapeHtml(run.requestId)} · 会话 ${escapeHtml(run.sessionId)} · 用户 ${escapeHtml(run.userId)}</span>${run.accessMode ? `<span>访问模式 ${escapeHtml(run.accessMode)}（请求未显式指定，使用协议默认值）</span>` : ""}<span>${escapeHtml(run.uiContext)}</span><span>临时服务仅本次关闭鉴权；Python 函数追踪不等于逐行覆盖。<a href="./${escapeHtml(run.traceFile)}" target="_blank" rel="noopener">查看原始采集记录 ↗</a></span></div>` : ""}
     <div class="workspace-label-row"><div><span class="workspace-overline">EXECUTION MAP</span><strong>运行链路</strong><span class="workspace-count">${steps.length} 步</span></div><div class="evidence-legend"><span><i class="legend-dot dynamic"></i>${isReal() ? "函数追踪 / WS 消息" : "运行事件"}</span><span><i class="legend-dot static"></i>源码关联</span></div></div>
     <section class="learning-workspace">
       <aside class="panel timeline-panel"><div class="pane-header"><div><span class="pane-label">FLOW STEPS</span><h2>执行步骤</h2></div><span class="pane-counter">${String(state.stepIndex + 1).padStart(2, "0")} <i>/ ${String(steps.length).padStart(2, "0")}</i></span></div>
         <div class="timeline-list">${steps.map((item, index) => `<button class="timeline-step ${index === state.stepIndex ? "is-active" : ""} ${item.evidence.startsWith("源码") ? "is-static" : ""}" data-step="${index}"><span class="timeline-rail"><i class="timeline-node">${index === state.stepIndex ? "✦" : String(index + 1).padStart(2, "0")}</i>${index < steps.length - 1 ? "<b></b>" : ""}</span><span class="timeline-copy"><strong>${escapeHtml(item.label)}</strong><small>${escapeHtml(item.event)}</small><span class="step-tags"><em class="${item.evidence.startsWith("源码") ? "tag-static" : "tag-dynamic"}">${escapeHtml(item.evidence)}</em><em>${escapeHtml(item.duration)}</em></span></span><span class="timeline-chevron">›</span></button>`).join("")}</div>
-        <div class="timeline-footer"><span class="tiny-check">✓</span><span>${isReal() ? `展示 <b>${steps.length}</b> 个归并步骤，停在 L52 执行前` : `展示 <b>${steps.length}</b> 步，其中 <b>${steps.filter((step) => step.evidence.startsWith("运行")).length}</b> 条演示事件`}</span><button title="运行证据说明" data-action="evidence-info">ⓘ</button></div>
+        <div class="timeline-footer"><span class="tiny-check">✓</span><span>${isReal() ? `展示 <b>${steps.length}</b> 个归并步骤，停在 L${runBoundary().line} 执行前` : `展示 <b>${steps.length}</b> 步，其中 <b>${steps.filter((step) => step.evidence.startsWith("运行")).length}</b> 条演示事件`}</span><button title="运行证据说明" data-action="evidence-info">ⓘ</button></div>
       </aside>
       <section class="panel source-panel"><div class="pane-header source-pane-header"><div><span class="pane-label">SOURCE VIEW</span><h2>对应源码</h2></div><button class="source-open-button" data-page="library" data-card="${activeCard.id}">打开卡片 <span>↗</span></button></div>
         <div class="file-tab-row"><span class="file-language-icon">${repo().language === "Python" ? "Py" : "TS"}</span><span class="file-name">${escapeHtml(activeCard.file.split("/").slice(-1)[0])}</span><span class="file-path">${escapeHtml(activeCard.file)}</span><button class="copy-button" data-action="copy-source" title="复制源码">▢ 复制</button></div>
@@ -202,7 +223,7 @@ function renderFlow() {
         </div>
       </aside>
     </section>
-    <div class="flow-bottom-hint"><span>⌘</span> ${isReal() ? "已保存 8094 的一次断点前采集。第 52 行及后续 Agent 流程均未执行；当前仅覆盖这条局部链路。" : "当前为离线演示链路，接入真实仓库后将由运行记录关联对应版本源码。"} <button data-page="library">查看卡片库 <b>→</b></button></div>`;
+    <div class="flow-bottom-hint"><span>⌘</span> ${isReal() ? "已保存 8094 的一次断点前采集。第 " + runBoundary().line + " 行及后续 Agent 流程均未执行；当前仅覆盖这条局部链路。" : "当前为离线演示链路，接入真实仓库后将由运行记录关联对应版本源码。"} <button data-page="library">查看卡片库 <b>→</b></button></div>`;
 }
 
 function filteredCards() {
@@ -257,18 +278,25 @@ function renderLibrary() {
   const activeReview = reviewFor(activeCard.id);
   const isReviewed = activeReview.status === "reviewed";
   const isEditing = state.editingCardId === activeCard.id;
-  const reviewedCount = repo().cards.filter((item) => reviewFor(item.id).status === "reviewed").length;
+  const reviewedCount = cardsForSnapshot().filter((item) => reviewFor(item.id).status === "reviewed").length;
   const reviewedAt = isReviewed && activeReview.reviewedAt ? new Date(activeReview.reviewedAt).toLocaleString("zh-CN", { hour12: false }) : "";
   const isBookmarked = bookmarks().has(activeCard.id);
-  const linkedScenario = repo().scenarios.find((item) => item.steps.some((step) => (step.cardIds || [step.cardId]).includes(activeCard.id)));
-  const linkedStepIndex = linkedScenario?.steps.findIndex((step) => (step.cardIds || [step.cardId]).includes(activeCard.id)) ?? 0;
-  const types = ["全部类型", ...new Set(repo().cards.map((item) => item.type))];
+  const containsCard = (steps) => steps.some((step) => (step.cardIds || [step.cardId]).includes(activeCard.id));
+  const linkedScenarios = repo().scenarios.filter((item) => containsCard(stepsFor(item))
+    || (hasNewSnapshot() && item.id === REAL_REPOSITORY.scenarios[0].id && containsCard(UPDATA_SNAPSHOT.steps)));
+  const linkedScenario = linkedScenarios[0];
+  const inCurrentFlow = linkedScenario && containsCard(stepsFor(linkedScenario));
+  const linkedStepIndex = !linkedScenario ? 0 : inCurrentFlow
+    ? stepsFor(linkedScenario).findIndex((step) => (step.cardIds || [step.cardId]).includes(activeCard.id))
+    : UPDATA_SNAPSHOT.steps.findIndex((step) => (step.cardIds || [step.cardId]).includes(activeCard.id));
+  const linkedRunId = linkedScenario && !inCurrentFlow ? UPDATA_SNAPSHOT.run.id : null;
+  const types = ["全部类型", ...new Set(cardsForSnapshot().map((item) => item.type))];
   const resultCards = filteredCards();
-  const fileCount = new Set(repo().cards.map((item) => item.file)).size;
+  const fileCount = new Set(cardsForSnapshot().map((item) => item.file)).size;
   return `
     <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>CODE KNOWLEDGE BASE</div><h1>代码解释卡片库 <span class="heading-spark">✦</span></h1><p class="page-lede">从文件、符号和解释出发，建立仓库自己的代码地图。</p></div><button class="button-secondary" data-action="export-cards"><span>↓</span> 导出卡片清单</button></div>
-    <div class="library-stats"><span><b>${repo().cards.length}</b> 张${isReal() ? "断点前" : "演示"}卡片</span><i></i><span><b>${fileCount}</b> 个${isReal() ? "真实" : "演示"}文件</span><i></i><span class="review-stat"><b>${reviewedCount}</b> 张已审核 · <b>${repo().cards.length - reviewedCount}</b> 张待审核</span><span class="library-snapshot">⌘ ${snapshot().name}</span></div>
-    ${isReal() ? `<div class="library-scope panel"><strong>当前收录范围</strong><span>${escapeHtml(repo().scope)}。卡片为固定提交的源码片段；文件数量与卡片数量均不代表全仓覆盖率。</span></div>` : ""}
+    <div class="library-stats"><span><b>${cardsForSnapshot().length}</b> 张${isReal() ? "断点前" : "演示"}卡片</span><i></i><span><b>${fileCount}</b> 个${isReal() ? "真实" : "演示"}文件</span><i></i><span class="review-stat"><b>${reviewedCount}</b> 张已审核 · <b>${cardsForSnapshot().length - reviewedCount}</b> 张待审核</span><span class="library-snapshot">⌘ ${snapshot().name}</span></div>
+    ${isReal() ? `<div class="library-scope panel"><strong>当前收录范围</strong><span>${escapeHtml(snapshot().scope || repo().scope)}。卡片为固定提交的源码片段；文件数量与卡片数量均不代表全仓覆盖率。</span></div>` : ""}
     <div class="library-toolbar panel"><label class="library-search"><span>⌕</span><input id="librarySearch" type="search" value="${escapeHtml(state.libraryQuery)}" placeholder="搜索源码、符号名或说明…" /><kbd>⌘ K</kbd></label><label class="filter-select"><span>卡片类型</span><select id="libraryType">${types.map((type) => `<option ${type === state.libraryType ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}</select><span class="select-chevron">⌄</span></label><label class="filter-select review-select"><span>审核状态</span><select id="libraryReviewStatus">${["全部状态", "待审核", "已审核"].map((status) => `<option ${status === state.libraryReviewStatus ? "selected" : ""}>${status}</option>`).join("")}</select><span class="select-chevron">⌄</span></label><button class="filter-button" data-action="clear-filters">↺ <span>重置</span></button></div>
     <div class="library-layout"><section class="panel library-list-panel"><div class="library-list-head"><div><strong>源码卡片</strong><small id="cardCount">${resultCards.length} 项</small></div><span aria-hidden="true">☷</span></div><div class="library-card-list" id="libraryCardResults">${renderCardRows(resultCards)}</div><div class="library-list-foot">已显示当前范围内的${isReal() ? "源码" : "演示"}卡片 <span>✦</span></div></section>
       <section class="panel card-detail-panel"><div class="card-detail-top"><div><span class="pane-label">SOURCE CARD</span><h2>${escapeHtml(activeCard.title)}</h2></div><button class="bookmark-button" data-action="bookmark" aria-label="${isBookmarked ? "取消收藏" : "收藏卡片"}" aria-pressed="${isBookmarked}" title="${isBookmarked ? "取消收藏" : "收藏卡片"}">${isBookmarked ? "★" : "☆"}</button></div><div class="card-meta-line"><span class="type-chip type-${activeCard.color}">${escapeHtml(activeCard.type)}</span><span class="review-status ${isReviewed ? "is-reviewed" : ""}">${isReviewed ? `已审核${isReal() ? "" : "（演示）"}` : "待人工审核"}</span><span>说明修订 ${activeReview.revision || 0} 次</span><span class="meta-spacer"></span><button data-action="bookmark">${isBookmarked ? "♥ 已收藏" : "♡ 收藏"}</button></div>
@@ -277,11 +305,52 @@ function renderLibrary() {
         ${isReal() ? `<div class="card-source-proof">固定提交 ${escapeHtml(snapshot().commit.slice(0, 7))} · 文件 SHA-256 ${escapeHtml(activeCard.fileHash.slice(0, 12))} · 片段 SHA-256 ${escapeHtml(activeCard.sourceHash.slice(0, 12))}</div>` : ""}
         <div class="card-explanation"><div class="explanation-heading"><span class="explanation-flower">✦</span><div><span class="pane-label">${isReviewed ? "REVIEWED EXPLANATION" : "EXPLANATION DRAFT"}</span><h3>这段代码的作用</h3></div><span class="draft-label">${isReal() ? (isReviewed ? "已审核说明" : "待核对说明") : "演示说明"}</span></div>${isEditing ? renderReviewEditor(activeCard) : `<p class="key-purpose">${escapeHtml(activeCard.purpose)}</p><div class="detail-field-grid"><div><span>输入</span><p>${escapeHtml(activeCard.input)}</p></div><div><span>输出</span><p>${escapeHtml(activeCard.output)}</p></div><div class="wide-field"><span>关联关系</span><p>${escapeHtml(activeCard.calls)}</p></div></div><div class="card-warning"><span>ⓘ</span>${escapeHtml(activeCard.note)}</div>`}
           <div class="card-review-panel"><div><strong>${isReviewed ? "✓ 已审核通过" : "○ 等待人工审核"}</strong><small>${isReviewed ? `确认时间：${escapeHtml(reviewedAt)}` : "核对说明后，可直接通过；有误时先编辑并保存。"}</small></div><div class="card-review-actions">${isEditing ? `<button class="button-secondary" data-action="cancel-card-edit">取消</button><button class="button-secondary" data-action="save-card-draft">保存草稿</button><button class="button-primary" data-action="approve-card-edits">保存并通过审核</button>` : `<button class="button-secondary" data-action="edit-card">编辑说明</button><button class="${isReviewed ? "button-secondary" : "button-primary"}" data-action="${isReviewed ? "reopen-card" : "approve-card"}">${isReviewed ? "撤回审核" : "确认审核通过"}</button>`}</div></div><p class="card-review-hint">${isReal() ? "人工审核只确认本卡说明；源码与采集证据仍以固定提交和原始记录为准。" : "审核状态仅保存在当前浏览器的当前仓库与快照中；此处均为假数据，不代表已核实真实源码。"}审核状态保存在当前浏览器，导出卡片清单可备份。</p></div>
-        <div class="card-used-by"><span>⌁</span><div><strong>被流程引用</strong><small>${repo().scenarios.filter((item) => item.steps.some((step) => (step.cardIds || [step.cardId]).includes(activeCard.id))).map((item) => escapeHtml(item.name)).join("、") || "暂未关联当前流程"}</small></div>${linkedScenario ? `<button data-page="flow" data-scenario="${linkedScenario.id}" data-step-target="${linkedStepIndex}" data-flow-card="${activeCard.id}">查看流程 →</button>` : ""}</div>
+        <div class="card-used-by"><span>⌁</span><div><strong>被流程引用</strong><small>${linkedScenarios.map((item) => escapeHtml(item.name)).join("、") || "暂未关联当前流程"}</small></div>${linkedScenario ? `<button data-page="flow" data-scenario="${linkedScenario.id}" data-step-target="${linkedStepIndex}" data-run="${linkedRunId || ""}" data-flow-card="${activeCard.id}">查看流程 →</button>` : ""}</div>
       </section></div>`;
 }
 
+function renderRealCompare() {
+  const older = REAL_REPOSITORY.snapshots[0];
+  const newer = CURRENT_UPDATA_SNAPSHOT;
+  const additions = new Set(UPDATA_SNAPSHOT.additions.map((item) => item.id));
+  const changedCount = UPDATA_SNAPSHOT.changes.length - additions.size;
+  const rows = UPDATA_SNAPSHOT.changes.map((change) => {
+    const oldCard = REAL_REPOSITORY.cards.find((item) => item.id === change.id);
+    const newCard = UPDATA_SNAPSHOT.additions.find((item) => item.id === change.id)
+      || { ...oldCard, ...UPDATA_SNAPSHOT.overrides[change.id] };
+    const added = additions.has(change.id);
+    const location = added ? '新增 L' + newCard.lineStart
+      : 'L' + oldCard.lineStart + ' → L' + newCard.lineStart;
+    return '<article class="panel diff-card"><div class="diff-card-head">'
+      + '<span class="diff-file-icon">Py</span><strong>' + escapeHtml(newCard.symbol) + '</strong>'
+      + '<span class="diff-kind ' + (added ? 'added' : 'changed') + '">' + (added ? '新增' : '修改') + '</span>'
+      + '<span class="diff-location">' + escapeHtml(location) + '</span>'
+      + '<button class="diff-expand" data-page="library" data-snapshot="' + newer.id
+      + '" data-card="' + escapeHtml(newCard.id) + '" aria-label="打开新版本源码">↗</button></div>'
+      + '<div class="diff-summary">' + escapeHtml(change.summary) + '<br><small>'
+      + escapeHtml(newCard.file) + '</small></div></article>';
+  }).join('');
+  return '<div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>VERSION EXPLORER</div>'
+    + '<h1>代码版本对比 <span class="heading-spark">✦</span></h1>'
+    + '<p class="page-lede">对照两个固定提交在普通对话入口前段的源码变化；延伸链路的新增卡片不计作版本差异。</p></div>'
+    + '<span class="compare-demo-pill real-compare-pill">真实快照</span></div>'
+    + '<section class="compare-selectors panel"><div class="compare-version"><span class="version-avatar old">A</span>'
+    + '<div><span class="pane-label">OLDER SNAPSHOT</span><strong>' + escapeHtml(older.name) + '</strong><small>'
+    + escapeHtml(older.commit.slice(0, 7)) + ' · L52 前</small></div></div><span class="compare-arrows">→</span>'
+    + '<div class="compare-version"><span class="version-avatar current">B</span><div><span class="pane-label">NEWER SNAPSHOT</span>'
+    + '<strong>' + escapeHtml(newer.name) + '</strong><small>' + escapeHtml(newer.commit.slice(0, 7))
+    + ' · 已延伸至 L178 前</small></div></div></section>'
+    + '<div class="compare-summary-row"><span class="compare-summary-icon">✦</span><div><strong>'
+    + changedCount + ' 张源码卡片有内容变化，' + additions.size + ' 张为新增函数卡片</strong>'
+    + '<small>这里只比较原先两版的共同前段；本次新增的 16 张后续流程卡片不计入版本差异。</small></div>'
+    + '<span class="diff-stat added">+ ' + additions.size + ' 新增</span>'
+    + '<span class="diff-stat changed">↻ ' + changedCount + ' 修改</span></div>'
+    + '<section class="diff-list">' + rows + '</section>'
+    + '<div class="compare-footnote"><span>ⓘ</span>每条差异可跳到 develop_updata 的固定源码卡片；旧版数据保留在原快照。</div>';
+}
+
 function renderCompare() {
+  if (isReal()) return renderRealCompare();
   if (repo().snapshots.length < 2) return `<div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>VERSION EXPLORER</div><h1>代码版本对比 <span class="heading-spark">✦</span></h1><p class="page-lede">当前真实仓库只收录固定提交 ${escapeHtml(snapshot().commit.slice(0, 7))} 的断点前链路。</p></div></div><section class="panel single-snapshot"><strong>目前只有一个源码快照</strong><p>新增另一个经过采集和索引的固定提交后，才能比较真实源码与流程差异。</p><button class="button-primary" data-page="flow">返回流程复盘 →</button></section>`;
   const older = repo().snapshots[1] || repo().snapshots[0];
   const newer = repo().snapshots[0];
@@ -301,7 +370,7 @@ function renderNotes() {
   return `
     <div class="page-heading"><div><div class="eyebrow"><span class="eyebrow-dot"></span>MY LEARNING NOTES</div><h1>学习笔记 <span class="heading-spark">✦</span></h1><p class="page-lede">把每次读懂的细节留下来，成为自己的代码地图。</p></div><span class="local-save-badge"><i></i> 点击保存后存入此浏览器</span></div>
     <div class="notes-grid"><section class="panel note-editor"><div class="note-editor-head"><div><span class="pane-label">QUICK NOTE</span><h2>今天的新发现</h2></div><span class="note-date">${new Date().toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}</span></div><label class="note-title-label">笔记内容<textarea id="noteInput" placeholder="比如：请求进入 RuntimeCoordinator 前，Gateway 会先确认 request_id……">${escapeHtml(saved)}</textarea></label><div class="note-editor-foot"><span><span class="tiny-check">✓</span> 写下理解、疑问或待验证的地方</span><button class="button-primary" data-action="save-note">保存笔记 <span>↗</span></button></div></section>
-      <aside class="panel notes-side"><span class="pane-label">LINKED TO</span><h2>关联当前学习内容</h2><div class="linked-item"><span class="linked-icon flow">⌁</span><div><strong>${escapeHtml(scenario().name)}</strong><small>当前场景 · ${scenario().steps.length} 步</small></div><button data-page="flow">↗</button></div><div class="linked-item"><span class="linked-icon code">ƒ</span><div><strong>${escapeHtml(cardFor(selectedStep().cardId).symbol)}</strong><small>${escapeHtml(cardFor(selectedStep().cardId).file.split("/").slice(-1)[0])}</small></div><button data-page="library" data-card="${selectedStep().cardId}">↗</button></div><div class="notes-tip"><span>✦</span><p>建议记录：这一步为什么会执行？它读取了什么，又改变了什么状态？</p></div></aside></div>`;
+      <aside class="panel notes-side"><span class="pane-label">LINKED TO</span><h2>关联当前学习内容</h2><div class="linked-item"><span class="linked-icon flow">⌁</span><div><strong>${escapeHtml(scenario().name)}</strong><small>当前场景 · ${snapshotSteps().length} 步</small></div><button data-page="flow">↗</button></div><div class="linked-item"><span class="linked-icon code">ƒ</span><div><strong>${escapeHtml(cardFor(selectedStep().cardId).symbol)}</strong><small>${escapeHtml(cardFor(selectedStep().cardId).file.split("/").slice(-1)[0])}</small></div><button data-page="library" data-card="${selectedStep().cardId}">↗</button></div><div class="notes-tip"><span>✦</span><p>建议记录：这一步为什么会执行？它读取了什么，又改变了什么状态？</p></div></aside></div>`;
 }
 
 function toast(message) {
@@ -378,10 +447,16 @@ function handleClick(event) {
   const nav = event.target.closest("[data-page]");
   if (nav) {
     if (nav.tagName === "A") event.preventDefault();
+    if (nav.dataset.snapshot && repo().snapshots.some((item) => item.id === nav.dataset.snapshot)) {
+      state.snapshotId = nav.dataset.snapshot;
+      state.runId = runsForSnapshot()[0].id;
+      state.stepIndex = 0;
+    }
     if (nav.dataset.scenario) {
       state.scenarioId = nav.dataset.scenario;
       state.runId = runsForSnapshot()[0].id;
     }
+    if (nav.dataset.run && runsForSnapshot().some((item) => item.id === nav.dataset.run)) state.runId = nav.dataset.run;
     if (nav.dataset.card) state.selectedCardId = nav.dataset.card;
     if (nav.dataset.stepTarget !== undefined) state.stepIndex = Number(nav.dataset.stepTarget);
     else if (nav.dataset.scenario) state.stepIndex = 0;
@@ -459,7 +534,7 @@ function handleClick(event) {
   }
   if (action === "export") exportRun();
   if (action === "export-cards") {
-    const blob = new Blob([JSON.stringify({ demo: !isReal(), repository: repo().name, snapshot: snapshot(), scope: repo().scope || null, cards: cardsForSnapshot().map((item) => ({ ...item, review: reviewFor(item.id) })) }, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify({ demo: !isReal(), repository: repo().name, snapshot: snapshot(), scope: snapshot().scope || repo().scope || null, cards: cardsForSnapshot().map((item) => ({ ...item, review: reviewFor(item.id) })) }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = `code-flow-cards-${repo().id}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); toast("卡片清单已导出");
   }
   if (action === "clear-filters") {
@@ -506,7 +581,7 @@ byId("repositorySelect").addEventListener("change", (event) => {
   state.stepIndex = 0;
   state.flowCardId = null;
   state.runId = runsForSnapshot()[0].id;
-  state.selectedCardId = scenario().steps[0].cardId;
+  state.selectedCardId = snapshotSteps()[0].cardId;
   state.libraryQuery = "";
   state.libraryType = "全部类型";
   state.libraryReviewStatus = "全部状态";

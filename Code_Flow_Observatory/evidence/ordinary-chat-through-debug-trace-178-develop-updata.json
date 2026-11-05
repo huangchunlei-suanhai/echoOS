@@ -1,0 +1,2714 @@
+{
+  "start": {
+    "file": "presentation/fastapi_gateway/application.py",
+    "line": 308,
+    "function": "ws_session",
+    "session_id": "debug-1030fco",
+    "request_id": "cfo-segment-1030-3cb5173"
+  },
+  "checkpoint": {
+    "file": "application/context/pipeline.py",
+    "line": 53,
+    "event_index": 258,
+    "request_id": "cfo-segment-1030-3cb5173",
+    "session_id": "debug-1030fco",
+    "user_id": "2113153353906343938",
+    "access_mode": "restricted",
+    "ui_context_keys": [
+      "page",
+      "visible"
+    ]
+  },
+  "hit": {
+    "file": "observability/debug_trace.py",
+    "line": 178,
+    "function": "DebugTraceRecorder.record",
+    "record_event": "request_started",
+    "mode": "off",
+    "trace_session_id": "debug-1030fco",
+    "trace_request_id": "cfo-segment-1030-3cb5173"
+  },
+  "events": [
+    {
+      "kind": "call",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 89
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 112
+    },
+    {
+      "kind": "call",
+      "file": "integrations/realtime/ws_session_broker.py",
+      "function": "connect",
+      "line": 21
+    },
+    {
+      "kind": "line",
+      "file": "integrations/realtime/ws_session_broker.py",
+      "function": "connect",
+      "line": 22
+    },
+    {
+      "kind": "line",
+      "file": "integrations/realtime/ws_session_broker.py",
+      "function": "connect",
+      "line": 23
+    },
+    {
+      "kind": "line",
+      "file": "integrations/realtime/ws_session_broker.py",
+      "function": "connect",
+      "line": 24
+    },
+    {
+      "kind": "line",
+      "file": "integrations/realtime/ws_session_broker.py",
+      "function": "connect",
+      "line": 23
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 113
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 115
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 116
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 115
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 117
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 115
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 118
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 115
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 130
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 128
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 129
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 128
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 130
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 128
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 131
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 128
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 152
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 160
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 172
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 173
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 174
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 175
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 177
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 196
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 305
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 306
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 308
+    },
+    {
+      "kind": "call",
+      "file": "middleware/auth_middleware.py",
+      "function": "__call__",
+      "line": 37
+    },
+    {
+      "kind": "call",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 308
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 309
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 318
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 320
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 321
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 322
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 323
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 324
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 325
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 326
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 321
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 329
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 333
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 334
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 335
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 336
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 334
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 168
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 178
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 179
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 161
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 164
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 165
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 166
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 180
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 181
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 182
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 338
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 349
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 350
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 352
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 357
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 360
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 361
+    },
+    {
+      "kind": "call",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_register_active_task",
+      "line": 115
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_register_active_task",
+      "line": 120
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_register_active_task",
+      "line": 121
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_register_active_task",
+      "line": 122
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_register_active_task",
+      "line": 124
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_register_active_task",
+      "line": 125
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_register_active_task",
+      "line": 126
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_register_active_task",
+      "line": 120
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 362
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 375
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 376
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 377
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 306
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 308
+    },
+    {
+      "kind": "call",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_after_registration",
+      "line": 352
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_after_registration",
+      "line": 354
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_after_registration",
+      "line": 355
+    },
+    {
+      "kind": "call",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 196
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 202
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 203
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 204
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 207
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 206
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 205
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 226
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 228
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 229
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 230
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 231
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 228
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "open_user_input_channel",
+      "line": 233
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "open_user_input_channel",
+      "line": 241
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "open_user_input_channel",
+      "line": 242
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "open_user_input_channel",
+      "line": 243
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "open_user_input_channel",
+      "line": 244
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "open_user_input_channel",
+      "line": 241
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "open",
+      "line": 33
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "open",
+      "line": 35
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "open",
+      "line": 36
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "open",
+      "line": 38
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "__init__",
+      "line": 15
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "__init__",
+      "line": 16
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "__init__",
+      "line": 17
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "__init__",
+      "line": 18
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "__init__",
+      "line": 19
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 234
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 236
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 237
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 238
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 239
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 235
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 234
+    },
+    {
+      "kind": "call",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_safe_send_json",
+      "line": 177
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_safe_send_json",
+      "line": 186
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_safe_send_json",
+      "line": 188
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_safe_send_json",
+      "line": 189
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_safe_send_json",
+      "line": 190
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 242
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 249
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 259
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 251
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 252
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 253
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 254
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 255
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 256
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 257
+    },
+    {
+      "kind": "line",
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 251
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 287
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 303
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 168
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 178
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 179
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 161
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 164
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 165
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 166
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 180
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 182
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 304
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 305
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 306
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 307
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 308
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 309
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 310
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 311
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 305
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 400
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 411
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 412
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 413
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 414
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 412
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "list_recent",
+      "line": 44
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "list_recent",
+      "line": 52
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 82
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 84
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "list_recent",
+      "line": 53
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 416
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 417
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 418
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 416
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "list_recent_events",
+      "line": 65
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "list_recent_events",
+      "line": 73
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 82
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 84
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "list_recent_events",
+      "line": 74
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 411
+    },
+    {
+      "kind": "call",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 34
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 40
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 41
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 42
+    },
+    {
+      "kind": "call",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "_find_active_task",
+      "line": 54
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "_find_active_task",
+      "line": 59
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "_find_active_task",
+      "line": 62
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 43
+    },
+    {
+      "kind": "call",
+      "file": "application/memory/event_projector.py",
+      "function": "build",
+      "line": 18
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_projector.py",
+      "function": "build",
+      "line": 20
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_projector.py",
+      "function": "build",
+      "line": 21
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_projector.py",
+      "function": "build",
+      "line": 23
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_projector.py",
+      "function": "build",
+      "line": 61
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 44
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 48
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 49
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 50
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 51
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 48
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 421
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 422
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 423
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 424
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 425
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 426
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 427
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 428
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/events.py",
+      "function": "now_utc_iso",
+      "line": 15
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/events.py",
+      "function": "now_utc_iso",
+      "line": 17
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 429
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 424
+    },
+    {
+      "kind": "call",
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 21
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 31
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 32
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 33
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 34
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 35
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 36
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 37
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 38
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 31
+    },
+    {
+      "kind": "call",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 235
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 251
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 252
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 253
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 254
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 255
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 256
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 257
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 258
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 259
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 260
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 261
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 262
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 263
+    },
+    {
+      "kind": "line",
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 251
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 421
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_append_memory_event",
+      "line": 687
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_append_memory_event",
+      "line": 699
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_append_memory_event",
+      "line": 700
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_append_memory_event",
+      "line": 701
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_append_memory_event",
+      "line": 702
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_append_memory_event",
+      "line": 699
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "append_event",
+      "line": 55
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "append_event",
+      "line": 63
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 82
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 84
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "<lambda>",
+      "line": 31
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "<lambda>",
+      "line": 31
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 434
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 435
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 436
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 437
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 438
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 439
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 440
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 441
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 434
+    },
+    {
+      "kind": "call",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 34
+    },
+    {
+      "kind": "line",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 52
+    },
+    {
+      "kind": "line",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 53
+    },
+    {
+      "kind": "call",
+      "file": "contracts/ui_context.py",
+      "function": "validate_page_scope",
+      "line": 343
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "validate_page_scope",
+      "line": 346
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "validate_page_scope",
+      "line": 349
+    },
+    {
+      "kind": "call",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 353
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 356
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 357
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 358
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 359
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 360
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 361
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 362
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 363
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 364
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 365
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 355
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 367
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 373
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 374
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "validate_page_scope",
+      "line": 350
+    },
+    {
+      "kind": "call",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_target_scope",
+      "line": 378
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_target_scope",
+      "line": 380
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_target_scope",
+      "line": 381
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "validate_page_scope",
+      "line": 351
+    },
+    {
+      "kind": "line",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 65
+    },
+    {
+      "kind": "line",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 66
+    },
+    {
+      "kind": "line",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 67
+    },
+    {
+      "kind": "line",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 68
+    },
+    {
+      "kind": "line",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 69
+    },
+    {
+      "kind": "line",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 70
+    },
+    {
+      "kind": "line",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 71
+    },
+    {
+      "kind": "line",
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 65
+    },
+    {
+      "kind": "call",
+      "file": "contracts/ui_context.py",
+      "function": "validate_page_scope",
+      "line": 343
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "validate_page_scope",
+      "line": 346
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "validate_page_scope",
+      "line": 349
+    },
+    {
+      "kind": "call",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 353
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 356
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 357
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 358
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 359
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 360
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 361
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 362
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 363
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 364
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 365
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 355
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 367
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 370
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 371
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 369
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 368
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 373
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_visible_scope",
+      "line": 374
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "validate_page_scope",
+      "line": 350
+    },
+    {
+      "kind": "call",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_target_scope",
+      "line": 378
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_target_scope",
+      "line": 380
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "_validate_target_scope",
+      "line": 381
+    },
+    {
+      "kind": "line",
+      "file": "contracts/ui_context.py",
+      "function": "validate_page_scope",
+      "line": 351
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 443
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 444
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 445
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 443
+    },
+    {
+      "kind": "call",
+      "file": "contracts/agent_request.py",
+      "function": "validate_input_channel",
+      "line": 32
+    },
+    {
+      "kind": "line",
+      "file": "contracts/agent_request.py",
+      "function": "validate_input_channel",
+      "line": 35
+    },
+    {
+      "kind": "line",
+      "file": "contracts/agent_request.py",
+      "function": "validate_input_channel",
+      "line": 37
+    },
+    {
+      "kind": "line",
+      "file": "contracts/agent_request.py",
+      "function": "validate_input_channel",
+      "line": 39
+    },
+    {
+      "kind": "line",
+      "file": "contracts/agent_request.py",
+      "function": "validate_input_channel",
+      "line": 41
+    },
+    {
+      "kind": "line",
+      "file": "contracts/agent_request.py",
+      "function": "validate_input_channel",
+      "line": 46
+    },
+    {
+      "kind": "line",
+      "file": "contracts/agent_request.py",
+      "function": "validate_input_channel",
+      "line": 58
+    },
+    {
+      "kind": "line",
+      "file": "contracts/agent_request.py",
+      "function": "validate_input_channel",
+      "line": 60
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 447
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 448
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 447
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "<genexpr>",
+      "line": 447
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "<genexpr>",
+      "line": 447
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 451
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 452
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 453
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 454
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 455
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 456
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 451
+    },
+    {
+      "kind": "call",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_execute_agent_request",
+      "line": 561
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_execute_agent_request",
+      "line": 574
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_execute_agent_request",
+      "line": 575
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_execute_agent_request",
+      "line": 576
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_execute_agent_request",
+      "line": 577
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_execute_agent_request",
+      "line": 574
+    },
+    {
+      "kind": "call",
+      "file": "observability/debug_trace.py",
+      "function": "bind_trace_context",
+      "line": 90
+    },
+    {
+      "kind": "line",
+      "file": "observability/debug_trace.py",
+      "function": "bind_trace_context",
+      "line": 99
+    },
+    {
+      "kind": "line",
+      "file": "observability/debug_trace.py",
+      "function": "bind_trace_context",
+      "line": 100
+    },
+    {
+      "kind": "line",
+      "file": "observability/debug_trace.py",
+      "function": "bind_trace_context",
+      "line": 101
+    },
+    {
+      "kind": "line",
+      "file": "observability/debug_trace.py",
+      "function": "bind_trace_context",
+      "line": 102
+    },
+    {
+      "kind": "line",
+      "file": "observability/debug_trace.py",
+      "function": "bind_trace_context",
+      "line": 99
+    },
+    {
+      "kind": "line",
+      "file": "observability/debug_trace.py",
+      "function": "bind_trace_context",
+      "line": 104
+    },
+    {
+      "kind": "line",
+      "file": "observability/debug_trace.py",
+      "function": "bind_trace_context",
+      "line": 105
+    },
+    {
+      "kind": "line",
+      "file": "observability/debug_trace.py",
+      "function": "bind_trace_context",
+      "line": 106
+    },
+    {
+      "kind": "line",
+      "file": "observability/debug_trace.py",
+      "function": "bind_trace_context",
+      "line": 107
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_execute_agent_request",
+      "line": 579
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_execute_agent_request",
+      "line": 580
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_execute_agent_request",
+      "line": 581
+    },
+    {
+      "kind": "line",
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_execute_agent_request",
+      "line": 579
+    },
+    {
+      "kind": "call",
+      "file": "observability/debug_trace.py",
+      "function": "record",
+      "line": 161
+    }
+  ],
+  "capture": {
+    "timestamp_utc": "2026-10-30T08:35:57.183404+00:00",
+    "source": "ws://172.20.163.11:8094/ws/sessions/debug-1030fco",
+    "repository": "/home/huangchunlei/workspace/echo/sftg_ai_backend",
+    "branch": "develop_updata",
+    "commit": "3cb5173064689c277d959dd315e3774112f32d06",
+    "stopped_before": "observability/debug_trace.py:178",
+    "auth": "disabled only in temporary capture process",
+    "debug_mode": "off; stopped before the mode check",
+    "ui_context": {
+      "page": "scene_center_page",
+      "visible": {
+        "page_state": {}
+      }
+    },
+    "trace_semantics": "Python call events may include async coroutine resumptions; line events exclude the target line, which did not execute.",
+    "client_messages": [
+      {
+        "type": "chat_ack",
+        "status": "accepted",
+        "error_code": null
+      },
+      {
+        "type": "chat_error",
+        "status": null,
+        "error_code": null
+      }
+    ]
+  }
+}

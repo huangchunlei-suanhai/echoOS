@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>天枢工作流工作台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --panel: #fff;
+      --line: #d7dee5;
+      --text: #202b35;
+      --muted: #687681;
+      --green: #147a62;
+      --green-soft: #e6f4ef;
+      --blue: #2864b4;
+      --orange: #bb5a18;
+      --red: #b42318;
+      --yellow: #9a6700;
+      font: 14px/1.45 ui-sans-serif, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 54px;
+      padding: 10px 18px;
+      background: #143e38;
+      color: white;
+    }
+    h1 { margin: 0; font-size: 16px; font-weight: 700; }
+    h2 { margin: 0; font-size: 14px; }
+    main { display: grid; gap: 10px; padding: 10px; }
+    .connection, .panel, .composer {
+      min-width: 0;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+    .connection {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 8px 10px;
+    }
+    .connection label { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .connection label:first-child { flex: 1 1 360px; }
+    .connection label:nth-child(2), .connection label:nth-child(3) { flex: 0 1 180px; }
+    .connection input { width: 100%; min-width: 0; flex: 1 1 auto; }
+    .connection input, .connection select, textarea, button {
+      border: 1px solid #bac6ce;
+      border-radius: 4px;
+      font: inherit;
+    }
+    .connection input, .connection select, textarea {
+      padding: 8px; color: var(--text); background: white;
+    }
+    .connection small { color: var(--muted); font-size: 11px; }
+    button { min-height: 34px; padding: 6px 11px; background: white; color: var(--text); cursor: pointer; }
+    button.primary { background: var(--green); color: white; border-color: var(--green); }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .status { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); white-space: nowrap; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #929da6; }
+    .dot.ok { background: var(--green); }
+    .dot.error { background: var(--red); }
+    .dot.running { background: var(--yellow); }
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(420px, 1.15fr) minmax(450px, 1fr);
+      gap: 10px;
+      min-height: calc(100vh - 230px);
+    }
+    .panel { display: flex; flex-direction: column; min-height: 0; padding: 10px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 8px; }
+    .panel-subtitle { color: var(--muted); font-size: 12px; }
+    .work-filter { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
+    .work-filter select { border: 1px solid #bac6ce; border-radius: 4px; padding: 5px 7px; font: inherit; }
+    #worklog {
+      display: grid;
+      align-content: start;
+      gap: 7px;
+      overflow: auto;
+      min-height: 250px;
+      max-height: calc(100vh - 310px);
+    }
+    .work-item {
+      display: grid;
+      grid-template-columns: 138px minmax(0, 1fr);
+      gap: 9px;
+      padding: 8px;
+      border-left: 3px solid var(--line);
+      background: #fafbfc;
+    }
+    .work-item[hidden] { display: none; }
+    .work-item.model { border-color: var(--blue); }
+    .work-item.user { border-color: #202b35; background: #f1f3f5; }
+    .work-item.tool { border-color: var(--green); }
+    .work-item.error { border-color: var(--red); }
+    .work-item.file { border-color: var(--orange); }
+    .work-time { color: var(--muted); font: 11px ui-monospace, monospace; }
+    .work-content { min-width: 0; }
+    .work-title { font-weight: 700; overflow-wrap: anywhere; }
+    .work-meta { margin-top: 3px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+    .work-text { margin-top: 5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .work-text strong { color: #111820; font-weight: 800; }
+    .scene-approval { margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--line); }
+    .scene-approval .work-title { color: var(--orange); }
+    .scene-approval pre { max-height: 320px; }
+    .scene-approval button { margin-top: 8px; }
+    .scene-approval .work-meta { margin-top: 7px; }
+    details { margin-top: 6px; }
+    summary { color: var(--blue); cursor: pointer; font-size: 12px; }
+    pre { max-height: 280px; overflow: auto; margin: 5px 0 0; padding: 8px; background: #17212b; color: #e6edf3; white-space: pre-wrap; overflow-wrap: anywhere; font: 11px/1.5 ui-monospace, monospace; }
+    .badge { display: inline-flex; margin-left: 6px; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; background: #edf0f2; color: #4c5963; }
+    .badge.success { background: #e2f3eb; color: #126345; }
+    .badge.error { background: #fde8e7; color: #a3261d; }
+    .badge.warning { background: #fff1ce; color: #815700; }
+    .empty { padding: 26px 8px; color: var(--muted); text-align: center; }
+    .graph-wrap { flex: 1; min-height: 350px; overflow: auto; border: 1px solid #e3e8ed; background: #fbfcfd; }
+    #dagGraph { display: block; min-width: 100%; min-height: 100%; }
+    .dag-edge { stroke: #7c8994; stroke-width: 1.6; fill: none; marker-end: url(#arrow); }
+    .dag-edge.data { stroke: #247663; }
+    .dag-node rect { fill: #fff; stroke: #78918a; stroke-width: 1.5; rx: 5; }
+    .dag-node text { fill: var(--text); font-size: 12px; pointer-events: none; }
+    .dag-node .node-type { fill: var(--muted); font-size: 10px; }
+    .graph-meta { display: flex; gap: 12px; align-items: center; min-width: 0; }
+    .graph-meta strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .composer { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 8px; }
+    .composer textarea { min-height: 58px; max-height: 180px; resize: vertical; }
+    .composer-actions { display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; }
+    @media (max-width: 900px) {
+      .workspace { grid-template-columns: 1fr; }
+      #worklog { max-height: 52vh; }
+      .graph-wrap { min-height: 380px; }
+    }
+    @media (max-width: 560px) {
+      header { padding: 10px; }
+      main { padding: 7px; }
+      .connection { flex-wrap: wrap; }
+      .connection label { flex-basis: 100%; }
+      .work-item { grid-template-columns: 1fr; gap: 3px; }
+      .composer { grid-template-columns: 1fr; }
+      .composer-actions { flex-direction: row; }
+      .composer-actions button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>天枢工作流工作台</h1>
+    <span id="connectionStatus" class="status"><i class="dot"></i>未连接</span>
+  </header>
+  <main>
+    <section class="connection" aria-label="天枢连接">
+      <label>天枢地址<input id="wsBase" aria-label="天枢 WebSocket 地址"></label>
+      <label>用户 ID<input id="userId" aria-label="用户 ID" autocomplete="off"></label>
+      <label>会话 ID<input id="sessionId" aria-label="会话 ID" autocomplete="off"></label>
+      <label>新任务权限<select id="accessMode" aria-label="新任务权限">
+        <option value="restricted">受限开放</option>
+        <option value="full">全量开放</option>
+      </select></label>
+      <button id="connectButton" class="primary">连接</button>
+      <button id="disconnectButton" disabled>断开</button>
+      <button id="newTaskButton" title="下一条消息以所选权限创建新任务，不改变当前任务" disabled>新建任务</button>
+      <span id="taskStatus" class="status">尚无任务</span>
+    </section>
+    <div class="workspace">
+      <section class="panel" aria-labelledby="workTitle">
+        <div class="panel-head">
+          <div>
+            <h2 id="workTitle">对话与操作</h2>
+          </div>
+          <div class="work-filter">
+            <label for="workFilter">筛选</label>
+            <select id="workFilter" aria-label="工作过程类型筛选">
+              <option value="all">全部交互</option>
+              <option value="user">用户消息</option>
+              <option value="model">天枢回复</option>
+              <option value="tool">工具调用</option>
+              <option value="file">文件操作</option>
+              <option value="error">错误</option>
+            </select>
+            <button id="clearButton" title="清空当前页面记录">清空</button>
+          </div>
+        </div>
+        <div id="worklog" aria-live="polite"><div class="empty">连接天枢后开始交互。</div></div>
+      </section>
+      <section class="panel" aria-labelledby="graphTitle">
+        <div class="panel-head">
+          <div class="graph-meta">
+            <h2 id="graphTitle">工作流 DAG</h2>
+            <strong id="dagName"></strong>
+          </div>
+          <span id="dagStatus" class="panel-subtitle">等待工作区</span>
+        </div>
+        <div class="graph-wrap" id="graphWrap">
+          <svg id="dagGraph" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="工作流 DAG 可视化"></svg>
+        </div>
+      </section>
+    </div>
+    <section class="composer" aria-label="发送消息给天枢">
+      <textarea id="message" aria-label="发送给天枢的消息" placeholder="描述要完成的工程工作流，或在任务进行中补充要求"></textarea>
+      <div class="composer-actions">
+        <button id="cancelButton" disabled>停止当前请求</button>
+        <button id="sendButton" class="primary" disabled>发送</button>
+      </div>
+    </section>
+  </main>
+  <script>
+    "use strict";
+    const $ = (id) => document.getElementById(id);
+    function makeId() {
+      if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+      // 非 HTTPS 页面可能没有 randomUUID；时间戳加随机段仍可生成请求关联标识。
+      return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${
+        Math.random().toString(36).slice(2)}`;
+    }
+    const state = {
+      socket: null,
+      userId: localStorage.getItem("tian-shu-debug-user") || `codex-debug-${makeId()}`,
+      sessionId: localStorage.getItem("tian-shu-debug-session") || `debug-${makeId()}`,
+      taskId: localStorage.getItem("tian-shu-debug-task") || "",
+      newTaskArmed: !localStorage.getItem("tian-shu-debug-task"),
+      previousTaskId: "",
+      requestId: null,
+      taskStatus: "",
+      lastGraphSignature: "",
+      worklogOffset: 0,
+      worklogKeys: new Set(),
+      toolRows: new Map(),
+      approvalButtons: new Map(),
+      approvedOperations: new Set(),
+      rejectedOperations: new Set(),
+      pendingApprovalId: "",
+      assistantMessageKeys: new Set(),
+      currentReplyTexts: new Set(),
+      finalReplyTexts: new Set(),
+      worklogBusy: false,
+      worklogAccessWarningShown: false,
+    };
+    const toolLabels = {
+      prepare_task_environment: "准备任务环境", list_workspace_files: "列出工作区文件",
+      read_workspace_file: "读取文件", search_workspace: "搜索工作区",
+      write_workspace_file: "创建文件", replace_workspace_text: "修改文件",
+      apply_patch: "应用局部补丁", get_workspace_diff: "查看文件差异",
+      rollback_workspace_change: "回滚修改", run_workspace_command: "运行命令",
+      install_task_dependencies: "安装依赖", get_task_environment: "检查运行环境",
+      validate_workflow_workspace: "校验工作流", run_cgraph_workflow: "运行整图",
+      list_scene_files: "列出场景文件", list_scene_nodes: "列出场景节点",
+      read_scene_node: "读取场景节点",
+      list_scene_workflows: "列出场景工作流", read_scene_workflow: "读取场景工作流",
+      write_scene_file: "写入场景文件", list_knowledge_documents: "列出知识文档",
+      "knowledge.search": "搜索场景知识", "knowledge.read": "读取场景知识",
+      "skills.list": "列出技能", "skills.read": "读取技能",
+      "skills.create": "创建技能", "skills.update": "更新技能",
+      "skills.validate": "校验技能",
+    };
+
+    function setConnection(connected, label = "", connecting = false) {
+      const status = $("connectionStatus");
+      status.replaceChildren();
+      const dot = document.createElement("i");
+      dot.className = `dot ${connected ? "ok" : connecting ? "running" : label ? "error" : ""}`;
+      status.append(dot, document.createTextNode(label || (connected ? "已连接" : "未连接")));
+      $("connectButton").disabled = connected || connecting;
+      $("disconnectButton").disabled = !connected && !connecting;
+      $("userId").disabled = connected || connecting;
+      $("sessionId").disabled = connected || connecting;
+      $("sendButton").disabled = !connected;
+      $("sendButton").textContent = state.requestId ? "追加指令" : "发送";
+      $("cancelButton").disabled = !connected || !state.requestId;
+      $("newTaskButton").disabled = !connected || Boolean(state.requestId) ||
+        (!state.taskId && state.newTaskArmed);
+      $("newTaskButton").textContent = state.newTaskArmed && state.taskId ?
+        "继续当前任务" : "新建任务";
+      $("accessMode").disabled = Boolean(state.requestId);
+      for (const [operationId, button] of state.approvalButtons) {
+        button.disabled = !connected || Boolean(state.requestId) ||
+          state.approvedOperations.has(operationId) || state.rejectedOperations.has(operationId);
+      }
+    }
+
+    function resetTaskView() {
+      state.taskId = "";
+      localStorage.setItem("tian-shu-debug-task", "");
+      state.taskStatus = "";
+      state.worklogOffset = 0;
+      state.worklogKeys.clear();
+      state.toolRows.clear();
+      state.approvalButtons.clear();
+      state.approvedOperations.clear();
+      state.rejectedOperations.clear();
+      state.pendingApprovalId = "";
+      state.assistantMessageKeys.clear();
+      state.lastGraphSignature = "";
+      $("worklog").replaceChildren();
+      renderDag(null);
+    }
+
+    function addWorkItem({ kind = "model", title, time, meta = "", text = "", details = null,
+      existingRow = null }) {
+      const row = existingRow || document.createElement("article");
+      row.className = `work-item ${kind}`;
+      row.dataset.kind = kind;
+      const timestamp = document.createElement("time");
+      timestamp.className = "work-time";
+      const parsed = time ? new Date(time) : new Date();
+      timestamp.textContent = Number.isNaN(parsed.getTime()) ? "时间未知" :
+        parsed.toLocaleString("zh-CN", { hour12: false, timeZone: "Asia/Shanghai" });
+      const content = document.createElement("div");
+      content.className = "work-content";
+      const heading = document.createElement("div");
+      heading.className = "work-title";
+      heading.textContent = title;
+      content.append(heading);
+      if (meta) {
+        const metaNode = document.createElement("div");
+        metaNode.className = "work-meta";
+        metaNode.textContent = meta;
+        content.append(metaNode);
+      }
+      if (text) {
+        const textNode = document.createElement("div");
+        textNode.className = "work-text";
+        // 只把受控的 Markdown 粗体转换为 strong；其余内容先转义，避免模型输出执行 HTML。
+        textNode.innerHTML = renderMarkdown(text);
+        content.append(textNode);
+      }
+      if (details != null) {
+        const detailsNode = document.createElement("details");
+        const summary = document.createElement("summary");
+        summary.textContent = "查看观察数据";
+        const pre = document.createElement("pre");
+        pre.textContent = JSON.stringify(details, null, 2);
+        detailsNode.append(summary, pre);
+        content.append(detailsNode);
+      }
+      row.replaceChildren(timestamp, content);
+      if (!existingRow) $("worklog").append(row);
+      applyWorkFilter();
+      $("worklog").scrollTop = $("worklog").scrollHeight;
+      return row;
+    }
+
+    function applyWorkFilter() {
+      const selected = $("workFilter").value;
+      for (const row of $("worklog").querySelectorAll(".work-item")) {
+        row.hidden = selected !== "all" && row.dataset.kind !== selected;
+      }
+    }
+
+    function renderMarkdown(value) {
+      const escaped = String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+      return escaped.replace(/\*\*([^*\n]+?)\*\*/g, "<strong>$1</strong>");
+    }
+
+    function safePayload(message) {
+      return message?.payload && typeof message.payload === "object" ? message.payload : {};
+    }
+
+    function markSceneApproval(operationId, status) {
+      if (!/^[0-9a-f]{32}$/.test(operationId)) return;
+      if (status === "approved") state.approvedOperations.add(operationId);
+      else state.rejectedOperations.add(operationId);
+      const button = state.approvalButtons.get(operationId);
+      if (button) {
+        button.disabled = true;
+        button.textContent = status === "approved" ? "已批准" : "确认被拒绝";
+      }
+      if (state.pendingApprovalId === operationId) state.pendingApprovalId = "";
+    }
+
+    function approveSceneWrite(operationId) {
+      const button = state.approvalButtons.get(operationId);
+      if (!button || button.disabled || !state.taskId || state.requestId ||
+        state.approvedOperations.has(operationId) || state.rejectedOperations.has(operationId)) return;
+      if (!send({ type: "agent_command", request_id: makeId(), user_id: state.userId,
+        command: { command: "approve_scene_write", task_id: state.taskId,
+          operation_id: operationId } })) return;
+      state.pendingApprovalId = operationId;
+      button.disabled = true;
+      button.textContent = "确认处理中";
+    }
+
+    function renderSceneApproval(row, observation) {
+      const data = observation?.data && typeof observation.data === "object" ?
+        observation.data : observation;
+      const operationId = String(data?.operation_id || "");
+      if (observation?.status !== "requires_confirmation" ||
+        !/^[0-9a-f]{32}$/.test(operationId) || !state.taskId) return;
+      const section = document.createElement("div");
+      section.className = "scene-approval";
+      const title = document.createElement("div");
+      title.className = "work-title";
+      title.textContent = `待确认场景写入：${String(data.path || "<路径缺失>")}`;
+      section.append(title);
+      const diff = typeof data.diff === "string" ? data.diff : "";
+      if (diff) {
+        const preview = document.createElement("pre");
+        preview.textContent = diff;
+        section.append(preview);
+      }
+      const incomplete = !diff || data.diff_truncated === true ||
+        diff.length >= 20000 || diff.endsWith("…") || diff.includes("<REDACTED>");
+      if (incomplete) {
+        const warning = document.createElement("div");
+        warning.className = "work-meta";
+        warning.textContent = "差异预览不完整，不能在此批准；请缩小修改后重新提交。";
+        section.append(warning);
+      } else {
+        const button = document.createElement("button");
+        button.textContent = state.approvedOperations.has(operationId) ? "已批准" :
+          state.rejectedOperations.has(operationId) ? "确认被拒绝" : "批准此项写入";
+        button.disabled = Boolean(state.requestId) ||
+          state.approvedOperations.has(operationId) || state.rejectedOperations.has(operationId);
+        button.onclick = () => approveSceneWrite(operationId);
+        section.append(button);
+        state.approvalButtons.set(operationId, button);
+      }
+      row.children[1].append(section);
+    }
+
+    function renderAssistantText(text, time, title = "天枢") {
+      if (!text || !String(text).trim()) return;
+      const key = `${time || ""}\n${text}`;
+      if (state.assistantMessageKeys.has(key) || state.finalReplyTexts.has(text)) return;
+      state.assistantMessageKeys.add(key);
+      state.currentReplyTexts.add(text);
+      addWorkItem({ kind: "model", title, time, text });
+    }
+
+    function renderAgentMessage(message) {
+      const payload = safePayload(message);
+      const stage = message.stage || message.event || "";
+      const type = message.type || "";
+      const time = message.created_at || new Date().toISOString();
+      if (type === "agent_progress") {
+        if (payload.task_id) {
+          state.taskId = payload.task_id;
+          localStorage.setItem("tian-shu-debug-task", state.taskId);
+        }
+        if (stage === "workflow_agent.assistant_text") {
+          renderAssistantText(message.message, payload.created_at || time);
+          return;
+        }
+        if (stage === "workflow_agent.scene_write_approved" &&
+          payload.task_id === state.taskId) {
+          markSceneApproval(String(payload.operation_id || ""), "approved");
+          return;
+        }
+        if (stage === "workflow_agent.scene_write_rejected" &&
+          payload.task_id === state.taskId) {
+          markSceneApproval(String(payload.operation_id || ""), "rejected");
+          return;
+        }
+        if (stage === "workflow_agent.user_input_applied") {
+          addWorkItem({ kind: "user", title: "追加指令已进入天枢上下文", time,
+            meta: payload.input_id || "", details: payload });
+          return;
+        }
+        if (stage === "workflow_agent.tool_calls_paused_for_user_input") {
+          addWorkItem({ kind: "model", title: "追加指令已暂停未开始的工具", time,
+            details: payload });
+          return;
+        }
+        if (stage === "workflow_agent.model_turn_failed") {
+          addWorkItem({ kind: "error", title: "模型请求失败", time,
+            meta: payload.error_code || "", details: payload });
+          return;
+        }
+        if (stage === "workflow_agent.context_overflow_retry_started" ||
+          stage === "workflow_agent.context_overflow_retry_unavailable") {
+          const retryStarted = stage.endsWith("retry_started");
+          addWorkItem({ kind: retryStarted ? "model" : "error",
+            title: retryStarted ? "上下文压缩后重试" : "上下文超限，无法重试",
+            time, details: payload });
+          return;
+        }
+        if (stage === "workflow_agent.tool_started" ||
+          stage === "workflow_agent.tool_completed") {
+          // 实时事件先给出工具状态；检查点到达后在原位置补上参数与结果。
+          const callId = String(payload.call_id || "");
+          const kind = stage.endsWith("tool_started") ? "tool_call" : "tool_result";
+          const liveKey = `${kind}:${callId || `${payload.tool_name}:${time}`}`;
+          if (!state.toolRows.has(liveKey)) {
+            const toolName = String(payload.tool_name || "<工具名缺失>");
+            const toolLabel = toolLabels[toolName] || toolName;
+            const failed = ["failed", "blocked", "error"].includes(
+              String(payload.status || "").toLowerCase());
+            const row = addWorkItem({
+              kind: failed ? "error" : "tool",
+              title: stage.endsWith("tool_started")
+                ? `调用工具：${toolLabel}`
+                : `工具结果：${toolLabel}`,
+              time,
+              text: stage.endsWith("tool_completed")
+                ? String(message.message || payload.status || "") : "",
+              details: payload,
+            });
+            state.toolRows.set(liveKey, row);
+            if (stage.endsWith("tool_completed") && toolName === "write_scene_file") {
+              renderSceneApproval(row, payload);
+            }
+          }
+          return;
+        }
+        if (stage === "workflow_agent.implementation_started") {
+          $("taskStatus").textContent = "天枢正在处理本轮消息";
+        }
+        if (stage === "workflow_agent.implementation_completed") {
+          state.taskStatus = payload.task_status || state.taskStatus;
+          $("taskStatus").textContent = `本轮已响应 · 工程任务 ${state.taskStatus}`;
+        }
+      } else if (type === "chat_final") {
+        const response = message.response || {};
+        const data = response.payload || {};
+        if (data.task_id) {
+          state.taskId = data.task_id;
+          localStorage.setItem("tian-shu-debug-task", state.taskId);
+          state.previousTaskId = "";
+        }
+        state.taskStatus = data.task_status || response.status || "";
+        if (response.message) {
+          if (!state.currentReplyTexts.has(response.message)) {
+            addWorkItem({ kind: "model", title: "天枢回复", time,
+              meta: response.status || "", text: response.message, details: data });
+          }
+          state.finalReplyTexts.add(response.message);
+        }
+        $("taskStatus").textContent = `本轮 ${response.status || "已响应"} · 工程任务 ${state.taskStatus}`;
+        refreshDag();
+        pollWorklog();
+      } else if (type === "chat_steer_ack") {
+        addWorkItem({
+          kind: message.accepted ? "user" : "error",
+          title: message.accepted ? "追加指令已排队" : "追加指令未接收",
+          time,
+          meta: message.input_id || "",
+          text: message.message || "",
+        });
+      } else if (type === "chat_error") {
+        if (state.pendingApprovalId) {
+          const button = state.approvalButtons.get(state.pendingApprovalId);
+          if (button) button.textContent = "重新批准";
+          state.pendingApprovalId = "";
+        }
+        if (state.previousTaskId && !state.taskId) {
+          state.taskId = state.previousTaskId;
+          localStorage.setItem("tian-shu-debug-task", state.taskId);
+          state.previousTaskId = "";
+          state.newTaskArmed = true;
+          refreshDag();
+          pollWorklog();
+        }
+        state.taskStatus = "failed";
+        $("taskStatus").textContent = "请求失败";
+        addWorkItem({ kind: "error", title: "天枢请求失败", time, text: message.message || "" });
+      }
+    }
+
+    function send(payload) {
+      const socket = state.socket;
+      if (!socket || socket.readyState !== WebSocket.OPEN || state.requestId) return false;
+      state.requestId = payload.request_id;
+      state.currentReplyTexts.clear();
+      state.finalReplyTexts.clear();
+      setConnection(true);
+      try {
+        socket.send(JSON.stringify(payload));
+      } catch (error) {
+        state.requestId = null;
+        setConnection(false, `发送失败：${error.message}`);
+        return false;
+      }
+      return true;
+    }
+
+    function sendChat() {
+      const prompt = $("message").value.trim();
+      if (!prompt) return;
+      if (state.requestId) {
+        const socket = state.socket;
+        if (!socket || socket.readyState !== WebSocket.OPEN) return;
+        socket.send(JSON.stringify({
+          type: "chat_steer",
+          request_id: state.requestId,
+          user_id: state.userId,
+          prompt,
+        }));
+        addWorkItem({ kind: "user", title: "用户追加指令", time: new Date().toISOString(),
+          text: prompt });
+        $("message").value = "";
+        return;
+      }
+      const startsNewTask = state.newTaskArmed || !state.taskId;
+      const payload = {
+        type: "chat_start", request_id: makeId(), user_id: state.userId, prompt,
+        access_mode: startsNewTask ? $("accessMode").value : "restricted",
+        ui_context: { page: "workflow_canvas_page", scene_id: "uav_cax_scene",
+          visible: { page_state: {}, canvas_detail: { workflow_id: state.taskId,
+            nodes: [], connections: [] } }, target: null },
+      };
+      if (!send(payload)) return;
+      if (startsNewTask) {
+        resetTaskView();
+        state.newTaskArmed = false;
+        $("taskStatus").textContent = "正在创建或恢复任务";
+      }
+      addWorkItem({ kind: "user", title: "用户", time: new Date().toISOString(),
+        text: prompt });
+      $("message").value = "";
+    }
+
+    function xml(name, attrs = {}, content = "") {
+      const node = document.createElementNS("http://www.w3.org/2000/svg", name);
+      for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+      if (content) node.textContent = content;
+      return node;
+    }
+
+    function renderDag(payload) {
+      const svg = $("dagGraph");
+      svg.replaceChildren();
+      const dag = payload?.dag;
+      if (!payload?.available || !dag) {
+        $("dagName").textContent = "";
+        $("dagStatus").textContent = state.taskId ? "等待 DAG 文件" : "等待工作区";
+        svg.setAttribute("viewBox", "0 0 800 400");
+        svg.append(xml("text", { x: 400, y: 200, "text-anchor": "middle", fill: "#687681" },
+          state.taskId ? "工作区尚未生成 workflow/workflow.json" : "开始任务后显示工作流图"));
+        return;
+      }
+      const nodes = dag.nodes.filter((node) => node && typeof node.instance_id === "string");
+      const specs = new Map(dag.node_specs.map((spec) => [spec.id, spec]));
+      const edges = dag.edges.filter((edge) => edge && nodes.some((n) => n.instance_id === edge.from_node)
+        && nodes.some((n) => n.instance_id === edge.to_node));
+      const indegree = new Map(nodes.map((node) => [node.instance_id, 0]));
+      for (const edge of edges) indegree.set(edge.to_node, (indegree.get(edge.to_node) || 0) + 1);
+      const queue = nodes.filter((node) => indegree.get(node.instance_id) === 0)
+        .map((node) => node.instance_id);
+      const levels = new Map(queue.map((id) => [id, 0]));
+      while (queue.length) {
+        const current = queue.shift();
+        for (const edge of edges.filter((item) => item.from_node === current)) {
+          levels.set(edge.to_node, Math.max(levels.get(edge.to_node) || 0, (levels.get(current) || 0) + 1));
+          indegree.set(edge.to_node, indegree.get(edge.to_node) - 1);
+          if (indegree.get(edge.to_node) === 0) queue.push(edge.to_node);
+        }
+      }
+      for (const node of nodes) if (!levels.has(node.instance_id)) levels.set(node.instance_id, 0);
+      const columns = new Map();
+      for (const node of nodes) {
+        const level = levels.get(node.instance_id) || 0;
+        if (!columns.has(level)) columns.set(level, []);
+        columns.get(level).push(node);
+      }
+      const colKeys = [...columns.keys()].sort((a, b) => a - b);
+      const width = Math.max(800, colKeys.length * 235 + 60);
+      const height = Math.max(420, Math.max(...[...columns.values()].map((items) => items.length)) * 125 + 60);
+      const positions = new Map();
+      colKeys.forEach((level, columnIndex) => {
+        columns.get(level).forEach((node, rowIndex) => {
+          positions.set(node.instance_id, { x: 30 + columnIndex * 235, y: 30 + rowIndex * 125 });
+        });
+      });
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.setAttribute("width", width);
+      svg.setAttribute("height", height);
+      const defs = xml("defs");
+      const marker = xml("marker", { id: "arrow", viewBox: "0 0 10 10", refX: 9, refY: 5,
+        markerWidth: 6, markerHeight: 6, orient: "auto-start-reverse" });
+      marker.append(xml("path", { d: "M 0 0 L 10 5 L 0 10 z", fill: "#7c8994" }));
+      defs.append(marker); svg.append(defs);
+      for (const edge of edges) {
+        const from = positions.get(edge.from_node); const to = positions.get(edge.to_node);
+        if (!from || !to) continue;
+        const startX = from.x + 190; const startY = from.y + 42;
+        const endX = to.x; const endY = to.y + 42;
+        const middle = Math.max(24, (endX - startX) / 2);
+        svg.append(xml("path", { class: `dag-edge ${edge.edge_type === "data" ? "data" : ""}`,
+          d: `M ${startX} ${startY} C ${startX + middle} ${startY}, ${endX - middle} ${endY}, ${endX} ${endY}` }));
+      }
+      for (const node of nodes) {
+        const pos = positions.get(node.instance_id); const spec = specs.get(node.node_type_id) || {};
+        const group = xml("g", { class: "dag-node" });
+        group.append(xml("rect", { x: pos.x, y: pos.y, width: 190, height: 84 }));
+        group.append(xml("text", { x: pos.x + 10, y: pos.y + 23 },
+          String(node.display_name || spec.display_name || node.instance_id).slice(0, 28)));
+        group.append(xml("text", { class: "node-type", x: pos.x + 10, y: pos.y + 43 },
+          `${node.instance_id} · ${node.status || ""}`.slice(0, 34)));
+        group.append(xml("text", { class: "node-type", x: pos.x + 10, y: pos.y + 64 },
+          String(spec.category || node.node_type_id || "").slice(0, 34)));
+        svg.append(group);
+      }
+      $("dagName").textContent = dag.name || "未命名工作流";
+      $("dagStatus").textContent = `${nodes.length} 个节点 · ${edges.length} 条边 · ${dag.executable ? "可执行" : "未就绪"}`;
+    }
+
+    async function refreshDag() {
+      if (!state.taskId) return;
+      const taskId = state.taskId;
+      try {
+        const response = await fetch(`/api/tasks/${encodeURIComponent(taskId)}/dag`,
+          { cache: "no-store" });
+        if (!response.ok) return;
+        const payload = await response.json();
+        if (state.taskId !== taskId) return;
+        const signature = JSON.stringify(payload.dag || null);
+        if (signature !== state.lastGraphSignature) {
+          state.lastGraphSignature = signature;
+          renderDag(payload);
+        }
+      } catch (_) {
+        $("dagStatus").textContent = "读取工作流图失败";
+      }
+    }
+
+    async function pollWorklog() {
+      if (!state.taskId || state.worklogBusy) return;
+      const taskId = state.taskId;
+      state.worklogBusy = true;
+      try {
+        const response = await fetch(
+          `/api/tasks/${encodeURIComponent(taskId)}/worklog?offset=${state.worklogOffset}&limit=200`,
+          { cache: "no-store" },
+        );
+        if (!response.ok) return;
+        const page = await response.json();
+        if (state.taskId !== taskId) return;
+        if (page.available === false && page.reason === "permission_denied" &&
+          !state.worklogAccessWarningShown) {
+          state.worklogAccessWarningShown = true;
+          addWorkItem({
+            kind: "error",
+            title: "无法读取历史工具详情",
+            text: "当前面板进程没有该任务检查点的读取权限；本轮工具名称和状态仍会实时显示。",
+          });
+        }
+        if (page.total < state.worklogOffset) {
+          // 上下文压缩会缩短检查点消息数组；旧数字游标此时不再指向新事件。
+          state.worklogOffset = 0;
+          setTimeout(pollWorklog, 0);
+          return;
+        }
+        for (const item of page.events || []) {
+          const stableKey = item.call_id ? `${item.kind}:${item.call_id}` :
+            `${item.kind}:${item.created_at || ""}:${item.text || item.event_id}`;
+          if (state.worklogKeys.has(stableKey)) continue;
+          state.worklogKeys.add(stableKey);
+          if (item.kind === "scene_write_approval" && item.task_id === taskId) {
+            markSceneApproval(
+              String(item.operation_id || ""),
+              item.status === "approved" ? "approved" : "rejected",
+            );
+            continue;
+          }
+          if (item.kind === "assistant_text") {
+            if (item.created_at) renderAssistantText(item.text, item.created_at);
+            continue;
+          }
+          if (item.kind !== "tool_call" && item.kind !== "tool_result") continue;
+          const toolKey = `${item.kind}:${item.call_id ||
+            `${item.tool_name || ""}:${item.created_at || ""}`}`;
+          const toolName = item.tool_name || item.observation?.tool_name || "<工具名缺失>";
+          const toolLabel = toolLabels[toolName] || toolName;
+          const title = item.kind === "tool_call" ?
+            `调用工具：${toolLabel}` : `工具结果：${toolLabel}`;
+          const row = addWorkItem({
+            kind: item.category === "error" ? "error" :
+              item.category === "file" ? "file" : "tool",
+            title,
+            time: item.created_at,
+            text: item.text || item.observation?.message || "",
+            details: item.arguments || item.observation || null,
+            existingRow: state.toolRows.get(toolKey),
+          });
+          state.toolRows.set(toolKey, row);
+          if (item.kind === "tool_result" && toolName === "write_scene_file") {
+            renderSceneApproval(row, item.observation);
+          }
+        }
+        state.worklogOffset = page.next_offset || state.worklogOffset;
+        if (page.has_more) setTimeout(pollWorklog, 0);
+      } catch (_) {
+        // WebSocket 阶段事件仍可用；工作日志接口暂时不可用时继续轮询，不中断交互。
+      } finally {
+        state.worklogBusy = false;
+      }
+    }
+
+    function connect() {
+      const base = $("wsBase").value.trim().replace(/\/$/, "");
+      state.userId = $("userId").value.trim();
+      state.sessionId = $("sessionId").value.trim();
+      if (!base) {
+        setConnection(false, "请填写天枢地址");
+        return;
+      }
+      if (!state.userId || !state.sessionId) {
+        setConnection(false, "请填写用户 ID 和会话 ID");
+        return;
+      }
+      if (state.socket && [WebSocket.CONNECTING, WebSocket.OPEN].includes(state.socket.readyState)) {
+        setConnection(state.socket.readyState === WebSocket.OPEN,
+          state.socket.readyState === WebSocket.OPEN ? "已连接" : "连接中…",
+          state.socket.readyState === WebSocket.CONNECTING);
+        return;
+      }
+      localStorage.setItem("tian-shu-debug-user", state.userId);
+      localStorage.setItem("tian-shu-debug-session", state.sessionId);
+      try {
+        state.socket = new WebSocket(`${base}/${encodeURIComponent(state.sessionId)}`);
+      } catch (error) {
+        setConnection(false, `地址无效：${error.message}`);
+        return;
+      }
+      const socket = state.socket;
+      let connectionFailed = false;
+      const connectionTimeout = setTimeout(() => {
+        if (socket.readyState !== WebSocket.CONNECTING || state.socket !== socket) return;
+        connectionFailed = true;
+        setConnection(false, "连接超时：浏览器无法连到 8099，请检查服务器 IP、端口开放和地址");
+        socket.close();
+      }, 10000);
+      setConnection(false, "正在连接…", true);
+      socket.addEventListener("open", () => {
+        clearTimeout(connectionTimeout);
+        if (state.socket === socket) setConnection(true);
+      });
+      socket.addEventListener("message", (event) => {
+        let message;
+        try { message = JSON.parse(event.data); }
+        catch { addWorkItem({ kind: "error", title: "收到无法解析的消息", text: String(event.data) }); return; }
+        renderAgentMessage(message);
+        if (message.request_id === state.requestId && ["chat_final", "chat_error"].includes(message.type)) {
+          state.requestId = null;
+          setConnection(true);
+        }
+        const payload = safePayload(message);
+        if (payload.task_id && !state.taskId) {
+          state.taskId = payload.task_id;
+          localStorage.setItem("tian-shu-debug-task", state.taskId);
+        }
+        if (state.taskId) { refreshDag(); pollWorklog(); }
+      });
+      socket.addEventListener("close", () => {
+        clearTimeout(connectionTimeout);
+        if (state.socket === socket) {
+          setConnection(false, connectionFailed ?
+            "连接失败或超时：检查服务器 IP、8099 端口开放和地址" : "连接已关闭");
+        }
+      });
+      socket.addEventListener("error", () => {
+        clearTimeout(connectionTimeout);
+        connectionFailed = true;
+        if (state.socket === socket) {
+          setConnection(false, "连接失败：检查服务器 IP、8099 端口开放和地址");
+        }
+      });
+    }
+
+    $("connectButton").onclick = connect;
+    $("disconnectButton").onclick = () => state.socket?.close();
+    $("sendButton").onclick = sendChat;
+    $("newTaskButton").onclick = () => {
+      if (state.requestId || !state.taskId) return;
+      // 任务由 user_id + session_id 唯一定位；创建新任务时轮换会话，而不是发送启动命令。
+      const nextSessionId = `debug-${makeId()}`;
+      state.sessionId = nextSessionId;
+      $("sessionId").value = nextSessionId;
+      localStorage.setItem("tian-shu-debug-session", nextSessionId);
+      resetTaskView();
+      state.newTaskArmed = true;
+      $("taskStatus").textContent = "已切换新会话，下一条消息将创建任务";
+      const socket = state.socket;
+      if (socket?.readyState === WebSocket.OPEN) {
+        socket.close();
+        setTimeout(connect, 0);
+      } else {
+        connect();
+      }
+    };
+    $("workFilter").onchange = applyWorkFilter;
+    $("userId").value = state.userId;
+    $("sessionId").value = state.sessionId;
+    $("userId").addEventListener("input", () => {
+      const nextUserId = $("userId").value.trim();
+      if (nextUserId !== state.userId) {
+        resetTaskView();
+        state.newTaskArmed = true;
+        $("taskStatus").textContent = "尚无任务";
+      }
+      state.userId = nextUserId;
+      localStorage.setItem("tian-shu-debug-user", state.userId);
+    });
+    $("sessionId").addEventListener("input", () => {
+      const nextSessionId = $("sessionId").value.trim();
+      if (nextSessionId !== state.sessionId) {
+        resetTaskView();
+        state.newTaskArmed = true;
+        $("taskStatus").textContent = "尚无任务";
+      }
+      state.sessionId = nextSessionId;
+      localStorage.setItem("tian-shu-debug-session", state.sessionId);
+    });
+    $("message").addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendChat(); }
+    });
+    $("cancelButton").onclick = () => {
+      if (!state.requestId || state.socket?.readyState !== WebSocket.OPEN) return;
+      state.socket.send(JSON.stringify({ type: "chat_cancel", request_id: state.requestId,
+        user_id: state.userId }));
+    };
+    $("clearButton").onclick = () => $("worklog").replaceChildren();
+    const pageProtocol = location.protocol === "https:" ? "wss:" : "ws:";
+    $("wsBase").value = `${pageProtocol}//${location.hostname}:8099/ws/sessions`;
+    if (state.taskId) {
+      $("taskStatus").textContent = `已恢复任务 · ${state.taskId}`;
+      refreshDag();
+      pollWorklog();
+    }
+    setInterval(() => { refreshDag(); pollWorklog(); }, 1500);
+    renderDag(null);
+  </script>
+</body>
+</html>

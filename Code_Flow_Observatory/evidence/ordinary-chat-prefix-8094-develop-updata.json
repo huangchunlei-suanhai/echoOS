@@ -1,0 +1,213 @@
+{
+  "hit": [
+    {
+      "file": "application/context/pipeline.py",
+      "line": 53,
+      "request_id": "cfo-prefix-1030-3cb5173",
+      "session_id": "debug-1030fco",
+      "user_id": "2113153353906343938",
+      "prompt": "你好，请简要说明你能帮我做什么。",
+      "ui_context_keys": [
+        "page",
+        "visible"
+      ],
+      "access_mode": "restricted",
+      "recent_turn_count": 0,
+      "has_active_task": false,
+      "has_task_projection": false
+    }
+  ],
+  "calls": [
+    {
+      "file": "middleware/auth_middleware.py",
+      "function": "__call__",
+      "line": 33
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 89
+    },
+    {
+      "file": "integrations/realtime/ws_session_broker.py",
+      "function": "connect",
+      "line": 21
+    },
+    {
+      "file": "middleware/auth_middleware.py",
+      "function": "__call__",
+      "line": 33
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "ws_session",
+      "line": 89
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 168
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 161
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_register_active_task",
+      "line": 115
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_after_registration",
+      "line": 352
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_run_agent_request",
+      "line": 196
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "open_user_input_channel",
+      "line": 233
+    },
+    {
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "open",
+      "line": 33
+    },
+    {
+      "file": "application/runtime/user_input_inbox.py",
+      "function": "__init__",
+      "line": 15
+    },
+    {
+      "file": "presentation/fastapi_gateway/application.py",
+      "function": "_safe_send_json",
+      "line": 177
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "run_chat_entry",
+      "line": 287
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "ensure_request",
+      "line": 168
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_request_scope_key",
+      "line": 161
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_run_chat_agent_request",
+      "line": 400
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "list_recent",
+      "line": 44
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 82
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "list_recent_events",
+      "line": 65
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 82
+    },
+    {
+      "file": "application/memory/session_memory_builder.py",
+      "function": "build",
+      "line": 34
+    },
+    {
+      "file": "application/memory/session_memory_builder.py",
+      "function": "_find_active_task",
+      "line": 54
+    },
+    {
+      "file": "application/memory/event_projector.py",
+      "function": "build",
+      "line": 18
+    },
+    {
+      "file": "application/runtime/events.py",
+      "function": "now_utc_iso",
+      "line": 15
+    },
+    {
+      "file": "application/memory/event_factory.py",
+      "function": "build_user_message_event",
+      "line": 21
+    },
+    {
+      "file": "application/memory/event_factory.py",
+      "function": "_build_event",
+      "line": 235
+    },
+    {
+      "file": "application/runtime/runtime_coordinator.py",
+      "function": "_append_memory_event",
+      "line": 687
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "append_event",
+      "line": 55
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "_key",
+      "line": 82
+    },
+    {
+      "file": "application/runtime/memory/session_memory_store.py",
+      "function": "<lambda>",
+      "line": 31
+    },
+    {
+      "file": "application/context/pipeline.py",
+      "function": "build",
+      "line": 34
+    }
+  ],
+  "capture": {
+    "timestamp_utc": "2026-10-30T07:39:46.584575+00:00",
+    "stopped_before": "application/context/pipeline.py:53",
+    "source": "Temporary uvicorn service bound to 0.0.0.0:8094; WebSocket request to ws://172.20.163.11:8094/ws/sessions/debug-1030fco",
+    "repository": "/home/huangchunlei/workspace/echo/sftg_ai_backend",
+    "branch": "develop_updata",
+    "commit": "3cb5173064689c277d959dd315e3774112f32d06",
+    "auth": "disabled only in temporary capture process",
+    "ui_context": {
+      "page": "workflow_canvas_page",
+      "visible": {
+        "page_state": {}
+      }
+    },
+    "client_messages": [
+      {
+        "type": "chat_ack",
+        "status": "accepted"
+      },
+      {
+        "type": "chat_error",
+        "cause": "trace callback intentionally raised StopBeforeValidation; not a business error"
+      }
+    ],
+    "trace_semantics": "Python call events include async coroutine resumptions; source snippets are excerpts, not line-by-line execution proof."
+  }
+}
