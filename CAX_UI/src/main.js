@@ -1,4 +1,5 @@
 import './style.css';
+import { createIcons, Info, X, ChevronLeft, ChevronRight, Scan, MoveHorizontal, MoveVertical, ZoomOut, ZoomIn, Maximize, Link2, Download } from 'lucide';
 
 const base = import.meta.env.BASE_URL;
 const asset = path => `${base}${path}`;
@@ -22,13 +23,51 @@ document.querySelector('#app').innerHTML = `
   </main>
   <footer><span>echo · 韶峰天工 / 天枢</span><span>界面设计作品 · 2026</span></footer>
   <dialog id="viewer" aria-labelledby="viewer-title">
-    <div class="viewer-header"><div class="viewer-info"><span id="viewer-category"></span><h2 id="viewer-title"></h2></div><button id="close" class="close" aria-label="关闭大图">关闭 ×</button></div>
-    <div class="viewer-tools"><div class="tool-group"><button id="previous" aria-label="上一页">← 上一页</button><span id="position"></span><button id="next" aria-label="下一页">下一页 →</button></div><div class="tool-group"><button id="fit">适应窗口</button><button id="fit-width">适应宽度</button><button id="zoom-out" aria-label="缩小">−</button><output id="zoom-label"></output><button id="zoom-in" aria-label="放大">＋</button><button id="original">原尺寸</button><button id="share">复制链接</button><a id="download" download>下载 PNG ↗</a></div></div>
-    <div id="viewport" class="viewport" tabindex="0" aria-label="设计大图，可滚动查看"><img id="full-image" alt=""></div>
-    <div class="viewer-footer"><span id="dimensions"></span><span id="viewer-message" role="status"></span><span>← → 切换页面 · Esc 关闭</span></div>
+    <div id="viewport" class="viewport" tabindex="0" aria-label="设计大图，可滚动查看"><div class="image-wrap"><img id="full-image" alt=""></div></div>
+    <aside id="viewer-drawer" class="viewer-drawer" aria-label="页面信息与操作" hidden>
+      <div class="drawer-heading"><span>页面信息</span><button id="drawer-close" class="icon-button" type="button" aria-label="收起页面信息" title="收起页面信息"><i data-lucide="x"></i></button></div>
+      <div class="drawer-body">
+        <span id="viewer-category" class="drawer-category"></span>
+        <h2 id="viewer-title"></h2>
+        <p id="dimensions" class="drawer-dimensions"></p>
+        <p class="drawer-position">第 <span id="position"></span> 页</p>
+        <div class="drawer-modes" role="group" aria-label="图片显示方式">
+          <button type="button" data-fit="window"><i data-lucide="scan"></i>适应窗口</button>
+          <button type="button" data-fit="width"><i data-lucide="move-horizontal"></i>适应宽度</button>
+          <button type="button" data-fit="height"><i data-lucide="move-vertical"></i>适应高度</button>
+          <button type="button" data-fit="original"><i data-lucide="maximize"></i>原尺寸</button>
+        </div>
+        <div class="drawer-actions">
+          <button id="share" type="button"><i data-lucide="link-2"></i>复制链接</button>
+          <a id="download" download><i data-lucide="download"></i>下载 PNG</a>
+        </div>
+        <p id="viewer-message" class="viewer-message" role="status"></p>
+      </div>
+    </aside>
+    <nav class="viewer-rail" aria-label="设计图操作">
+      <button id="details" class="icon-button" type="button" aria-label="页面信息与更多操作" title="页面信息与更多操作" aria-controls="viewer-drawer" aria-expanded="false"><i data-lucide="info"></i></button>
+      <span class="rail-separator"></span>
+      <button id="previous" class="icon-button" type="button" aria-label="上一页" title="上一页"><i data-lucide="chevron-left"></i></button>
+      <span id="rail-position" class="rail-position"></span>
+      <button id="next" class="icon-button" type="button" aria-label="下一页" title="下一页"><i data-lucide="chevron-right"></i></button>
+      <span class="rail-separator"></span>
+      <button id="fit" class="icon-button" type="button" aria-label="适应窗口" title="适应窗口"><i data-lucide="scan"></i></button>
+      <button id="fit-width" class="icon-button" type="button" aria-label="适应宽度" title="适应宽度"><i data-lucide="move-horizontal"></i></button>
+      <button id="fit-height" class="icon-button" type="button" aria-label="适应高度" title="适应高度"><i data-lucide="move-vertical"></i></button>
+      <button id="zoom-out" class="icon-button" type="button" aria-label="缩小" title="缩小"><i data-lucide="zoom-out"></i></button>
+      <output id="zoom-label" class="zoom-label" aria-label="当前缩放比例"></output>
+      <button id="zoom-in" class="icon-button" type="button" aria-label="放大" title="放大"><i data-lucide="zoom-in"></i></button>
+      <button id="original" class="icon-button" type="button" aria-label="原尺寸" title="原尺寸"><i data-lucide="maximize"></i></button>
+      <span class="rail-spacer"></span>
+      <button id="rail-share" class="icon-button" type="button" aria-label="复制链接" title="复制链接"><i data-lucide="link-2"></i></button>
+      <a id="rail-download" class="icon-button" download aria-label="下载 PNG" title="下载 PNG"><i data-lucide="download"></i></a>
+      <button id="close" class="icon-button" type="button" aria-label="关闭大图" title="关闭大图"><i data-lucide="x"></i></button>
+    </nav>
   </dialog>`;
 
-let pages = [], versions = [], filtered = [], category = '全部', version = '9.30', activeId = null, scale = 1, fitMode = true;
+createIcons({ icons: { Info, X, ChevronLeft, ChevronRight, Scan, MoveHorizontal, MoveVertical, ZoomOut, ZoomIn, Maximize, Link2, Download }, attrs: { 'stroke-width': 1.8 } });
+
+let pages = [], versions = [], filtered = [], category = '全部', version = '9.30', activeId = null, scale = 1, fitMode = 'window';
 const $ = selector => document.querySelector(selector);
 const dialog = $('#viewer');
 let lastFocus;
@@ -65,19 +104,38 @@ function navigationPages() {
   const visible = filtered.filter(page => !page.pending);
   return visible.some(page => page.id === activeId) ? visible : pages.filter(page => page.version === current?.version && !page.pending);
 }
+function updateModeButtons() {
+  for (const button of document.querySelectorAll('[data-fit]')) button.setAttribute('aria-pressed', String(button.dataset.fit === fitMode));
+  for (const [selector, mode] of [['#fit', 'window'], ['#fit-width', 'width'], ['#fit-height', 'height'], ['#original', 'original']]) {
+    $(selector).setAttribute('aria-pressed', String(mode === fitMode));
+  }
+}
 function setScale(nextScale) {
   const page = activePage();
   if (!page) return;
   scale = Math.max(0.05, Math.min(4, nextScale));
   $('#full-image').style.width = `${Math.round(page.width * scale)}px`;
   $('#zoom-label').textContent = `${Math.round(scale * 100)}%`;
+  updateModeButtons();
 }
 function fit(mode = 'window') {
   const page = activePage();
   if (!page) return;
   fitMode = mode;
-  const widthScale = ($('#viewport').clientWidth - 48) / page.width;
-  setScale(mode === 'width' ? Math.min(1, widthScale) : Math.min(1, widthScale, ($('#viewport').clientHeight - 48) / page.height));
+  if (mode === 'original') { setScale(1); return; }
+  const viewport = $('#viewport');
+  const style = getComputedStyle(viewport);
+  const availableWidth = viewport.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  const availableHeight = viewport.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+  const widthScale = availableWidth / page.width;
+  const heightScale = availableHeight / page.height;
+  setScale(mode === 'width' ? widthScale : mode === 'height' ? heightScale : Math.min(widthScale, heightScale));
+  viewport.scrollTo(mode === 'height' ? (viewport.scrollWidth - viewport.clientWidth) / 2 : 0, 0);
+}
+function toggleDetails(open = $('#viewer-drawer').hidden) {
+  $('#viewer-drawer').hidden = !open;
+  $('#details').setAttribute('aria-expanded', String(open));
+  if (dialog.open && fitMode) fit(fitMode);
 }
 function updateViewer() {
   const page = activePage();
@@ -86,20 +144,24 @@ function updateViewer() {
   $('#viewer-title').textContent = page.title;
   $('#viewer-category').textContent = page.category;
   $('#position').textContent = `${index + 1} / ${sequence.length}`;
+  $('#rail-position').textContent = `${index + 1}/${sequence.length}`;
   $('#previous').disabled = index <= 0;
   $('#next').disabled = index >= sequence.length - 1;
   $('#dimensions').textContent = `${page.width} × ${page.height} px`;
   $('#viewer-message').textContent = '正在载入高清图…';
   const img = $('#full-image');
   img.onload = () => { $('#viewer-message').textContent = ''; };
-  img.onerror = () => { $('#viewer-message').textContent = '图片加载失败，请稍后重新打开。'; };
+  img.onerror = () => { $('#viewer-message').textContent = '图片加载失败，请稍后重新打开。'; toggleDetails(true); };
   img.alt = `${page.title}完整设计稿`;
   img.src = asset(page.image);
   $('#download').href = asset(page.image);
   $('#download').download = `${page.title}.png`;
+  $('#rail-download').href = asset(page.image);
+  $('#rail-download').download = `${page.title}.png`;
   $('#viewport').scrollTo(0, 0);
   document.title = `${page.title} | 天枢 · echo`;
-  fit(page.height > page.width * 1.5 ? 'width' : 'window');
+  const compact = matchMedia('(max-width: 640px), (max-width: 950px) and (max-height: 600px)').matches;
+  fit(page.height > page.width * 1.5 ? 'width' : compact && page.width > page.height ? 'height' : 'window');
 }
 function openPage(id, updateHash = true) {
   if (!pages.some(page => page.id === id && !page.pending)) return;
@@ -108,12 +170,14 @@ function openPage(id, updateHash = true) {
     lastFocus = document.activeElement;
     dialog.showModal();
     document.body.classList.add('viewing');
+    toggleDetails(false);
   }
   updateViewer();
   if (updateHash) window.location.hash = `page=${encodeURIComponent(id)}`;
 }
 function closeViewer(updateHash = true) {
   if (dialog.open) dialog.close();
+  toggleDetails(false);
   activeId = null;
   document.body.classList.remove('viewing');
   document.title = '天枢 · AI 助手界面设计 | echo';
@@ -150,19 +214,32 @@ $('#versions').addEventListener('click', event => {
   if (button) { version = button.dataset.version; category = '全部'; renderCategories(); renderGallery(); }
 });
 $('#search').addEventListener('input', renderGallery);
+$('#details').addEventListener('click', () => toggleDetails());
+$('#drawer-close').addEventListener('click', () => toggleDetails(false));
+$('#viewer-drawer').addEventListener('click', event => {
+  const button = event.target.closest('[data-fit]');
+  if (button) fit(button.dataset.fit);
+});
 $('#close').addEventListener('click', () => closeViewer());
 dialog.addEventListener('cancel', event => { event.preventDefault(); closeViewer(); });
 $('#previous').addEventListener('click', () => navigate(-1));
 $('#next').addEventListener('click', () => navigate(1));
 $('#fit').addEventListener('click', () => fit());
 $('#fit-width').addEventListener('click', () => fit('width'));
-$('#original').addEventListener('click', () => { fitMode = false; setScale(1); });
+$('#fit-height').addEventListener('click', () => fit('height'));
+$('#original').addEventListener('click', () => fit('original'));
 $('#zoom-in').addEventListener('click', () => { fitMode = false; setScale(scale * 1.25); });
 $('#zoom-out').addEventListener('click', () => { fitMode = false; setScale(scale / 1.25); });
-$('#share').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(location.href); $('#viewer-message').textContent = '页面链接已复制'; }
-  catch { $('#viewer-message').textContent = '请复制浏览器地址栏中的链接'; }
-});
+async function copyLink() {
+  try {
+    await navigator.clipboard.writeText(location.href);
+    $('#viewer-message').textContent = '页面链接已复制';
+    $('#rail-share').title = '链接已复制';
+    setTimeout(() => { $('#rail-share').title = '复制链接'; }, 2000);
+  } catch { $('#viewer-message').textContent = '请复制浏览器地址栏中的链接'; toggleDetails(true); }
+}
+$('#share').addEventListener('click', copyLink);
+$('#rail-share').addEventListener('click', copyLink);
 document.addEventListener('keydown', event => {
   if (!dialog.open || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName) || event.ctrlKey || event.metaKey || event.altKey) return;
   if (event.key === 'ArrowLeft') { event.preventDefault(); navigate(-1); }
